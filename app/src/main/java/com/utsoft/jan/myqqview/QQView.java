@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
 import android.graphics.RectF;
+import android.graphics.SweepGradient;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -59,6 +60,7 @@ public class QQView extends View {
     private AnimatorSet animatorSetTwo;
     private ValueAnimator mLightWaveAnimator;
     private long mLightWaveAnimTime = 4000L;
+    private SweepGradient mSweepGradient;
 
     public QQView(Context context) {
         super(context);
@@ -89,10 +91,10 @@ public class QQView extends View {
         int centerY = (int) (mArcCenterY + 274.f / 506.f * mHeight);
         int centerX = 0;
 
-        mAllPointCount=9+8;
-        waveWidth = (int) (160.f/ 435.f * mWith);
+        mAllPointCount=9+8+8;
+        waveWidth = (int) (260.f/ 435.f * mWith);
         waveNum= 0;
-        mWaveHeight = (int) (25.f/506.f*mHeight);
+        mWaveHeight = (int) (18.f/506.f*mHeight);
 
         points = getPoints(centerY, centerX);
 
@@ -116,7 +118,24 @@ public class QQView extends View {
         //屏幕外
         for (int i = 0; i < mHalfPointCount; i++) {
             //y 周的點
-            points[i] = new Point( -(i/4*waveWidth+waveWidth/(1+i%4)),points[mHalfPointCount+i].y);
+            //points[mHalfPointCount+i].x
+            //points[i] = new Point( -(i/4*waveWidth+waveWidth/(1+i%4)),points[mHalfPointCount+i].y);
+            int index = mHalfPointCount - i - 1;
+            if (index % 2 != 0) {
+                if (points[mHalfPointCount + i + 1].y > centerPoint.y) {
+                    points[index] = new Point(-points[mHalfPointCount + i + 1].x, points[mHalfPointCount + i + 1].y - 2 * mWaveHeight);
+                }
+                else if (points[mHalfPointCount + i + 1].y < centerPoint.y) {
+                    points[index] = new Point(-points[mHalfPointCount + i + 1].x, points[mHalfPointCount + i + 1].y + 2 * mWaveHeight);
+                }
+            }
+            else {
+                points[index] = new Point(-points[mHalfPointCount + i + 1].x, points[mHalfPointCount + i + 1].y);
+            }
+        }
+
+        for (int i = 0; i < points.length; i++) {
+            Log.i(TAG, "getPoints: "+points[i].toString());
         }
 
         return points;
@@ -124,6 +143,7 @@ public class QQView extends View {
 
     private void drawWave(Canvas canvas,float offsetWidth,int offsetHeight){
         mWavePath.reset();
+        //mBelPath.reset();
         mWavePath.moveTo(points[0].x+offsetWidth,points[0].y+offsetHeight);
         for (int i = 1;i<mAllPointCount;i+=2)
         {
@@ -131,7 +151,18 @@ public class QQView extends View {
                     points[i+1].x+offsetWidth,points[i+1].y+offsetHeight);
         }
 
-        //mWavePath.lineTo(points[mAllPointCount-1].x+mOffsetWidth,points[mAllPointCount-1].y+mOffsetHeight);
+        mWavePath.lineTo(points[mAllPointCount-1].x+offsetWidth,points[mAllPointCount-1].y+offsetHeight);
+
+        mWavePath.lineTo(mWith , mHeight- 18.f / 435.f * mWith);
+        mWavePath.quadTo(mWith, mHeight, mWith - (int) 18.f / 435.f * mWith, mHeight );
+
+        mWavePath.lineTo((int) 18.f / 435.f * mWith, mHeight);
+        mWavePath.quadTo(0, mHeight, 0, mHeight-(int) 18.f / 435.f * mWith);
+        //mWavePath.lineTo(mWith,mHeight);
+        //mWavePath.lineTo(0,mHeight);
+        //mWavePath.lineTo(0,mHeight);
+        mWavePath.close();
+        //mWavePath.op(mBelPath,Path.Op.INTERSECT);
         canvas.drawPath(mWavePath,mWavePaint);
     }
 
@@ -171,7 +202,9 @@ public class QQView extends View {
         mWavePaint.setColor(mBelowBackgroundColor);
         mWavePaint.setAntiAlias(true);
         mWavePaint.setStyle(Paint.Style.FILL);
-        mWavePaint.setStrokeWidth(3);
+        mWavePaint.setStrokeWidth(1);
+
+        mBelPath = new Path();
 
         animatorSet = new AnimatorSet();
 
@@ -226,6 +259,13 @@ public class QQView extends View {
         //animatorSetTwo.start();
 
 
+    }
+
+    private void updateArcPaint() {
+        // 设置渐变
+        int[] mGradientColors = {Color.parseColor("#c1c1c1"), Color.rgb(38, 184, 240), Color.BLUE};
+        mSweepGradient = new SweepGradient(mArcCenterX, mArcCenterY, mGradientColors, null);
+        mArcPaint.setShader(mSweepGradient);
     }
 
     private void startLightWaveAnimator() {
@@ -317,7 +357,7 @@ public class QQView extends View {
 
         mArcPaint.setStrokeWidth(mArcWith);
         mBarPaint.setStrokeWidth(mArcWith);
-
+        updateArcPaint();
         initWave();
         startLightWaveAnimator();
     }
@@ -331,7 +371,7 @@ public class QQView extends View {
         DrawUpBg(canvas);
 
         canvas.drawArc(mArcRect, 120, 300 * percent, false, mArcPaint);
-        canvas.drawRect(mArcRect, p);
+        //canvas.drawRect(mArcRect, p);
 
         int sposX = (int) (mArcCenterX);
         int sposY = (int) (mArcCenterY - 33.f / 506.f * mHeight);
@@ -419,7 +459,6 @@ public class QQView extends View {
 
     private void drawBelowBackground(int left, int i, int mWith, int mHeight, int mBelowBackgroundColor, Canvas canvas, int belowCorner) {
         bgPaint.setColor(mBelowBackgroundColor);
-        mBelPath = new Path();
         float heightY = mHeight - 73.f / 506.f * mHeight;
         mBelPath.moveTo(left, heightY);
         mBelPath.lineTo(left, heightY + 63.f / 506.f * mHeight);
@@ -444,12 +483,14 @@ public class QQView extends View {
         mBelPath.lineTo(mWith, heightY);
         //mBelPath.lineTo(left,heightY);
         //mBelPath.close();
-        canvas.drawPath(mBelPath, bgPaint);
+
+        //canvas.drawPath(mBelPath, bgPaint);
     }
 
     private void DrawUpBg(Canvas canvas) {
 
         bgPaint.setColor(Color.WHITE);
+        bgPaint.setShadowLayer(15,10,10,Color.GRAY);
 
         mUpPath = new Path();
         float heightY = mHeight - 73.f / 506.f * mHeight;
@@ -464,6 +505,7 @@ public class QQView extends View {
         mUpPath.lineTo(mWith, heightY);
         //mBelPath.lineTo(left,heightY);
         mUpPath.close();
+
         canvas.drawPath(mUpPath, bgPaint);
     }
 
