@@ -38,6 +38,7 @@ import static android.opengl.GLES20.glViewport;
  * Created by Administrator on 2019/8/22.
  * <p>
  * by author wz
+ * 第三章结束
  * <p>
  * com.utsoft.jan.myqqview
  */
