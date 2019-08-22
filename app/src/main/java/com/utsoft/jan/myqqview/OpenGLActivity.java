@@ -18,18 +18,16 @@ import java.util.Arrays;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import static android.opengl.GLES10.GL_POINTS;
 import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
 import static android.opengl.GLES20.GL_FLOAT;
 import static android.opengl.GLES20.GL_LINES;
-import static android.opengl.GLES20.GL_POINTS;
-import static android.opengl.GLES20.GL_TRIANGLES;
+import static android.opengl.GLES20.GL_TRIANGLE_FAN;
 import static android.opengl.GLES20.glClear;
 import static android.opengl.GLES20.glClearColor;
 import static android.opengl.GLES20.glDrawArrays;
 import static android.opengl.GLES20.glEnableVertexAttribArray;
 import static android.opengl.GLES20.glGetAttribLocation;
-import static android.opengl.GLES20.glGetUniformLocation;
-import static android.opengl.GLES20.glUniform4f;
 import static android.opengl.GLES20.glUseProgram;
 import static android.opengl.GLES20.glVertexAttribPointer;
 import static android.opengl.GLES20.glViewport;
@@ -83,28 +81,48 @@ public class OpenGLActivity extends AppCompatActivity {
 
         private int program;
 
-        private static final String U_COLOR="u_Color";
-
-        private int uColorLoacation;
-
         private static final String A_POSITION = "a_Position";
 
         private int aPositionLocation;
 
+        private static final String A_Color = "a_Color";
+
+        private int aColorLocation;
+
+        private static final int Color_Component_Count = 3;
+
+        private static final int STRIDE = (position_component_count+Color_Component_Count)*bytes_per_float;
+
+//        private  float[] tableVer ={
+//                -0.5f, -0.5f,
+//                0.5f, 0.5f,
+//                -0.5f, 0.5f,
+//
+//                -0.5f, -0.5f,
+//                0.5f, -0.5f,
+//                0.5f, 0.5f,
+//
+//                -0.5f, 0f,
+//                0.5f, 0f,
+//
+//                0f, -0.25f,
+//                0f, 0.25f,
+//        };
+
         private  float[] tableVer ={
-                -0.5f, -0.5f,
-                0.5f, 0.5f,
-                -0.5f, 0.5f,
+                0f, 0f,1f,1f,1f,
+                -0.5f, -0.5f,0.7f,0.7f,0.7f,
+                0.5f, -0.5f,0.7f,0.7f,0.7f,
 
-                -0.5f, -0.5f,
-                0.5f, -0.5f,
-                0.5f, 0.5f,
+                0.5f, 0.5f,0.7f,0.7f,0.7f,
+                -0.5f, 0.5f,0.7f,0.7f,0.7f,
+                -0.5f, -0.5f,0.7f,0.7f,0.7f,
 
-                -0.5f, 0f,
-                0.5f, 0f,
+                 -0.5f, 0f,1f,0f,0f,
+                 0.5f, 0f,0f,0f,1f,
 
-                0f, -0.25f,
-                0f, 0.25f,
+                 0f, -0.25f,0f,0f,1f,
+                 0f, 0.25f,1f,0f,0f,
         };
 
         private  float[] copy;
@@ -119,10 +137,10 @@ public class OpenGLActivity extends AppCompatActivity {
             System.arraycopy(initCircle,0,copy,tableVer.length,initCircle.length);
 
             verData = ByteBuffer
-                    .allocateDirect(copy.length * bytes_per_float)
+                    .allocateDirect(tableVer.length * bytes_per_float)
                     .order(ByteOrder.nativeOrder())
                     .asFloatBuffer();
-            verData.put(copy);
+            verData.put(tableVer);
         }
 
         private int vertCount = 200;
@@ -172,16 +190,18 @@ public class OpenGLActivity extends AppCompatActivity {
             glUseProgram(program);
 
             //得到这个位置
-            uColorLoacation = glGetUniformLocation(program,U_COLOR);
-
+//            uColorLoacation = glGetUniformLocation(program,U_COLOR);
+            aColorLocation =  glGetAttribLocation(program,A_Color);
             aPositionLocation = glGetAttribLocation(program,A_POSITION);
 
             verData.position(0);
 
-            glVertexAttribPointer(aPositionLocation,position_component_count,GL_FLOAT,false,0,verData);
+            glVertexAttribPointer(aPositionLocation,position_component_count,GL_FLOAT,false,STRIDE,verData);
             glEnableVertexAttribArray(aPositionLocation);
 
-
+            verData.position(position_component_count);
+            glVertexAttribPointer(aColorLocation,Color_Component_Count,GL_FLOAT,false,STRIDE,verData);
+            glEnableVertexAttribArray(aColorLocation);
 
         }
 
@@ -193,17 +213,22 @@ public class OpenGLActivity extends AppCompatActivity {
         @Override
         public void onDrawFrame(GL10 gl) {
             glClear(GL_COLOR_BUFFER_BIT);
-            glUniform4f(uColorLoacation,1.0f,1.0f,1.0f,1.0f);
-            glDrawArrays(GL_TRIANGLES,0,6);
-            glUniform4f(uColorLoacation,1.0f,0.0f,0.0f,1.0f);
+//            glUniform4f(uColorLoacation,1.0f,1.0f,1.0f,1.0f);
+            glDrawArrays(GL_TRIANGLE_FAN,0,6);
+//            glUniform4f(uColorLoacation,1.0f,0.0f,0.0f,1.0f);
             glDrawArrays(GL_LINES,6,2);
-            glUniform4f(uColorLoacation,0.0f,0.0f,1.0f,1.0f);
+//            glUniform4f(uColorLoacation,0.0f,0.0f,1.0f,1.0f);
             glDrawArrays(GL_POINTS,8,1);
-            glUniform4f(uColorLoacation,1.0f,0.0f,0.0f,1.0f);
+//            glUniform4f(uColorLoacation,1.0f,0.0f,0.0f,1.0f);
             glDrawArrays(GL_POINTS,9,1);
 
-            glUniform4f(uColorLoacation,0.0f,0.0f,0.0f,1.0f);
-            glDrawArrays(GL_POINTS,10,copy.length);
+            /**
+             * 画圆
+             */
+ //            glUniform4f(uColorLoacation,0.0f,0.0f,0.0f,1.0f);
+//            glDrawArrays(GL_POINTS,10,copy.length);
+
+
         }
     }
 
