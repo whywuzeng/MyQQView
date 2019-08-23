@@ -66,7 +66,7 @@ public class OpenGLActivity extends AppCompatActivity {
         if (isSupportEs2) {
             mGlSurfaceView.setEGLContextClientVersion(2);
 
-            mGlSurfaceView.setRenderer(new FirstOpenGLProjectRenderer(this));
+            mGlSurfaceView.setRenderer(new AirRenderer(this));
             isSender = true;
         }
         else {

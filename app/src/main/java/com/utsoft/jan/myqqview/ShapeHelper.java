@@ -104,4 +104,22 @@ public class ShapeHelper {
         Log.e(TAG, "validateProgram: validate" + statusId[0] + "\nLog" + glGetProgramInfoLog(programObjectId));
         return statusId[0] != 0;
     }
+
+    public static int buildProgram(String vertexShaderSource,
+                                   String fragmentShaderSource
+                                   ){
+        int program;
+
+        final int vertexShader = complieVertexShader(vertexShaderSource);
+        final int fragmentShader = complieFragmentShader(fragmentShaderSource);
+
+        program = linkProgram(vertexShader,fragmentShader);
+
+        if (LoggerConfig.ON)
+        {
+            validateProgram(program);
+        }
+
+        return program;
+    }
 }
