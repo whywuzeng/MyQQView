@@ -11,6 +11,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.WindowManager;
 
+import com.utsoft.jan.myqqview.helper.MatrixHelper;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
@@ -120,24 +122,26 @@ public class OpenGLActivity extends AppCompatActivity {
 //        };
 
         private  float[] tableVer ={
-                0f, 0f,1f,1f,1f,
-                -0.5f, -0.8f,0.7f,0.7f,0.7f,
-                0.5f, -0.8f,0.7f,0.7f,0.7f,
+                0f, 0f,  1f, 1f, 1f,
+                -0.5f, -0.8f,  0.7f, 0.7f, 0.7f,
+                0.5f, -0.8f,  0.7f, 0.7f, 0.7f,
 
-                0.5f, 0.8f,0.7f,0.7f,0.7f,
-                -0.5f, 0.8f,0.7f,0.7f,0.7f,
-                -0.5f, -0.8f,0.7f,0.7f,0.7f,
+                0.5f, 0.8f,  0.7f, 0.7f, 0.7f,
+                -0.5f, 0.8f,  0.7f, 0.7f, 0.7f,
+                -0.5f, -0.8f,  0.7f, 0.7f, 0.7f,
 
-                 -0.5f, 0f,1f,0f,0f,
-                 0.5f, 0f,0f,0f,1f,
+                -0.5f, 0f,  1f, 0f, 0f,
+                0.5f, 0f,  0f, 0f, 1f,
 
-                 0f, -0.25f,0f,0f,1f,
-                 0f, 0.25f,1f,0f,0f,
+                0f, -0.25f,  0f, 0f, 1f,
+                0f, 0.25f,  1f, 0f, 0f,
         };
 
         private  float[] copy;
 
         private Random random = new Random();
+
+        private final float[] modelMatrix = new float[16];
 
         public FirstOpenGLProjectRenderer(Context context) {
             this.mContext = context;
@@ -221,14 +225,24 @@ public class OpenGLActivity extends AppCompatActivity {
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
             glViewport(0, 0, width, height);
-            final float rate =  width> height?(float)width/height:(float)height/width;
-            if (width>height)
-            {
-                Matrix.orthoM(matrixFloats,0,-rate,rate,-1,1,-1,1);
-            }else {
-                Matrix.orthoM(matrixFloats,0,-1,1,-rate,rate,-1,1);
-            }
+            //final float rate =  width> height?(float)width/height:(float)height/width;
+            //if (width>height)
+            //{
+            //    Matrix.orthoM(matrixFloats,0,-rate,rate,-1,1,-1,1);
+            //}else {
+            //    Matrix.orthoM(matrixFloats,0,-1,1,-rate,rate,-1,1);
+            //}
 
+            MatrixHelper.perspectiveM(matrixFloats, 45, (float) width / (float) height, 1f, -10f);
+
+            //modelMatrix
+            Matrix.setIdentityM(modelMatrix,0);
+            Matrix.translateM(modelMatrix,0,0,0,-2.5f);
+            Matrix.rotateM(modelMatrix,0,-60f,1f,0f,0f);
+
+            final float[] temp = new float[16];
+            Matrix.multiplyMM(temp,0,matrixFloats,0,modelMatrix,0);
+            System.arraycopy(temp,0,matrixFloats,0,temp.length);
         }
 
         @Override
