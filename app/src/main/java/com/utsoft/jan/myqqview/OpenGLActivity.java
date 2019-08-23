@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Arrays;
+import java.util.Random;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -28,6 +30,8 @@ import static android.opengl.GLES20.glClearColor;
 import static android.opengl.GLES20.glDrawArrays;
 import static android.opengl.GLES20.glEnableVertexAttribArray;
 import static android.opengl.GLES20.glGetAttribLocation;
+import static android.opengl.GLES20.glGetUniformLocation;
+import static android.opengl.GLES20.glUniformMatrix4fv;
 import static android.opengl.GLES20.glUseProgram;
 import static android.opengl.GLES20.glVertexAttribPointer;
 import static android.opengl.GLES20.glViewport;
@@ -93,6 +97,12 @@ public class OpenGLActivity extends AppCompatActivity {
 
         private static final int STRIDE = (position_component_count+Color_Component_Count)*bytes_per_float;
 
+        private static final String u_Matrix = "u_Matrix";
+
+        private int uMatrixLocation;
+
+        private  float[] matrixFloats = new float[16];
+
 //        private  float[] tableVer ={
 //                -0.5f, -0.5f,
 //                0.5f, 0.5f,
@@ -111,12 +121,12 @@ public class OpenGLActivity extends AppCompatActivity {
 
         private  float[] tableVer ={
                 0f, 0f,1f,1f,1f,
-                -0.5f, -0.5f,0.7f,0.7f,0.7f,
-                0.5f, -0.5f,0.7f,0.7f,0.7f,
+                -0.5f, -0.8f,0.7f,0.7f,0.7f,
+                0.5f, -0.8f,0.7f,0.7f,0.7f,
 
-                0.5f, 0.5f,0.7f,0.7f,0.7f,
-                -0.5f, 0.5f,0.7f,0.7f,0.7f,
-                -0.5f, -0.5f,0.7f,0.7f,0.7f,
+                0.5f, 0.8f,0.7f,0.7f,0.7f,
+                -0.5f, 0.8f,0.7f,0.7f,0.7f,
+                -0.5f, -0.8f,0.7f,0.7f,0.7f,
 
                  -0.5f, 0f,1f,0f,0f,
                  0.5f, 0f,0f,0f,1f,
@@ -126,6 +136,8 @@ public class OpenGLActivity extends AppCompatActivity {
         };
 
         private  float[] copy;
+
+        private Random random = new Random();
 
         public FirstOpenGLProjectRenderer(Context context) {
             this.mContext = context;
@@ -194,8 +206,9 @@ public class OpenGLActivity extends AppCompatActivity {
             aColorLocation =  glGetAttribLocation(program,A_Color);
             aPositionLocation = glGetAttribLocation(program,A_POSITION);
 
-            verData.position(0);
+            uMatrixLocation = glGetUniformLocation(program,u_Matrix);
 
+            verData.position(0);
             glVertexAttribPointer(aPositionLocation,position_component_count,GL_FLOAT,false,STRIDE,verData);
             glEnableVertexAttribArray(aPositionLocation);
 
@@ -208,12 +221,23 @@ public class OpenGLActivity extends AppCompatActivity {
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
             glViewport(0, 0, width, height);
+            final float rate =  width> height?(float)width/height:(float)height/width;
+            if (width>height)
+            {
+                Matrix.orthoM(matrixFloats,0,-rate,rate,-1,1,-1,1);
+            }else {
+                Matrix.orthoM(matrixFloats,0,-1,1,-rate,rate,-1,1);
+            }
+
         }
 
         @Override
         public void onDrawFrame(GL10 gl) {
             glClear(GL_COLOR_BUFFER_BIT);
+            //float changex = (random.nextFloat()-1);
+            //Matrix.translateM(matrixFloats,0,changex,0,0);
 //            glUniform4f(uColorLoacation,1.0f,1.0f,1.0f,1.0f);
+            glUniformMatrix4fv(uMatrixLocation,1,false,matrixFloats,0);
             glDrawArrays(GL_TRIANGLE_FAN,0,6);
 //            glUniform4f(uColorLoacation,1.0f,0.0f,0.0f,1.0f);
             glDrawArrays(GL_LINES,6,2);
