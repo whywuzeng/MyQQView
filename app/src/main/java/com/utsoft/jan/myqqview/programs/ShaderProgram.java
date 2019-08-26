@@ -29,9 +29,11 @@ public class ShaderProgram {
 
     protected final int program;
 
+    protected static final String U_COLOR ="u_Color";
+
+
     public ShaderProgram(Context context, int vextexShaderResourceId, int fragmentShaderResourceId) {
         program = ShapeHelper.buildProgram(TextResourceReader.readTextResource(context, vextexShaderResourceId), TextResourceReader.readTextResource(context, fragmentShaderResourceId));
-
     }
 
     public void useProgram() {
