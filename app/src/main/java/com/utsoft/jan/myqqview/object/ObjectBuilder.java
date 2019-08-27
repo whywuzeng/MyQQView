@@ -28,7 +28,7 @@ public class ObjectBuilder {
     private List<DrawCommand> drawCommands = new ArrayList<>();
 
     public ObjectBuilder(int sizeInVertices) {
-        this.vertexData = new float[sizeInVertices];
+        this.vertexData = new float[sizeInVertices*float_per_vertex];
     }
 
     //圆和 圆柱体 顶点的个数
@@ -105,7 +105,7 @@ public class ObjectBuilder {
         vertexData[offset++] = circle.center.y;
         vertexData[offset++] = circle.center.z;
 
-        for (int i = 0; i < numPoints; i++) {
+        for (int i = 0; i <= numPoints; i++) {
             final float angleFloat = (float) (Math.PI * 2.0f * i / numPoints);
             final float disZ = (float) (circle.radius * Math.sin(angleFloat));
             final float disX = (float) (circle.radius * Math.cos(angleFloat));
@@ -131,7 +131,7 @@ public class ObjectBuilder {
         final float startY = cylinder.center.y - cylinder.height / 2;
         final float endY = cylinder.center.y + cylinder.height / 2;
 
-        for (int i = 0; i < numPoints; i++) {
+        for (int i = 0; i <=numPoints; i++) {
 
             float angleR = (float) (2 * Math.PI * i / numPoints);
             final float disX = (float) (Math.cos(angleR) * cylinder.radius);

@@ -12,8 +12,6 @@ import com.utsoft.jan.myqqview.programs.ColorShaderProgram;
 import com.utsoft.jan.myqqview.programs.TextureShaderProgram;
 import com.utsoft.jan.myqqview.utils.TextureHelper;
 
-import java.io.PipedReader;
-
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -98,21 +96,38 @@ public class AirRenderer implements GLSurfaceView.Renderer {
 
         Matrix.multiplyMM(viewProjectionMatrix,0,matrixFloats,0,viewMatrix,0);
 
-        positionTableIn
-        //textureShaderProgram.useProgram();
-        //textureShaderProgram.setUniform(matrixFloats,texture);
-        //table.bindData(textureShaderProgram);
-        //table.draw();
-        //
-        //colorShaderProgram.useProgram();
-        //colorShaderProgram.setUniform(modelMatrix);
-        //mallet.bindData(colorShaderProgram);
-        //mallet.draw();
+        positionTableInScene();
+        textureShaderProgram.useProgram();
+        textureShaderProgram.setUniform(matrixFloats,texture);
+        table.bindData(textureShaderProgram);
+        table.draw();
+
+        positionObjectInScene(0,mallet.height/2,-0.4f);
+        colorShaderProgram.useProgram();
+        colorShaderProgram.setUniform(matrixFloats,1f,0f,0f);
+        mallet.bindData(colorShaderProgram);
+        mallet.draw();
+
+        positionObjectInScene(0,mallet.height/2,-0.4f);
+        colorShaderProgram.setUniform(matrixFloats,0f,0f,1f);
+        mallet.draw();
+
+        positionObjectInScene(0f,mPuck.height/2f,0.4f);
+        colorShaderProgram.setUniform(matrixFloats,0.8f,0.8f,1f);
+        mPuck.bindData(colorShaderProgram);
+        mPuck.draw();
+
     }
 
     private void positionTableInScene(){
         Matrix.setIdentityM(modelMatrix,0);
         Matrix.rotateM(modelMatrix,0,-90f,1f,0f,0f);
-        Matrix.multiplyMM(modeViewProjectionMatrix,0,matrixFloats);
+        Matrix.multiplyMM(modeViewProjectionMatrix,0,matrixFloats,0,viewMatrix,0);
+    }
+
+    private void positionObjectInScene(float x,float y,float z){
+        Matrix.setIdentityM(modelMatrix,0);
+        Matrix.translateM(modelMatrix,0,x,y,z);
+        Matrix.multiplyMM(modeViewProjectionMatrix,0,viewProjectionMatrix,0,modelMatrix,0);
     }
 }
