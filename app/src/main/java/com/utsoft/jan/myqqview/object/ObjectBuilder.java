@@ -117,7 +117,7 @@ public class ObjectBuilder {
         drawCommands.add(new DrawCommand() {
             @Override
             public void draw() {
-                glDrawArrays(GL_TRIANGLE_STRIP, startVertex, numVertices);
+                glDrawArrays(GL_TRIANGLE_FAN, startVertex, numVertices);
             }
         });
     }
@@ -149,7 +149,7 @@ public class ObjectBuilder {
         drawCommands.add(new DrawCommand() {
             @Override
             public void draw() {
-                glDrawArrays(GL_TRIANGLE_FAN, startVertex, numVertices);
+                glDrawArrays(GL_TRIANGLE_STRIP, startVertex, numVertices);
             }
         });
 

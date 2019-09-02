@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.WindowManager;
 
 import com.utsoft.jan.myqqview.helper.MatrixHelper;
@@ -63,15 +65,45 @@ public class OpenGLActivity extends AppCompatActivity {
         activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         final ConfigurationInfo info = activityManager.getDeviceConfigurationInfo();
         final boolean isSupportEs2 = info.reqGlEsVersion >= 0x20000;
+        final AirRenderer airRenderer = new AirRenderer(this);
         if (isSupportEs2) {
             mGlSurfaceView.setEGLContextClientVersion(2);
 
-            mGlSurfaceView.setRenderer(new AirRenderer(this));
+            mGlSurfaceView.setRenderer(airRenderer);
             isSender = true;
         }
         else {
             Log.i(TAG, "onCreate: 不支持");
         }
+        mGlSurfaceView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event != null) {
+                    final float normalizedX = (event.getX() / (float) v.getWidth()) * 2 - 1;
+                    final float normalizedY = -((event.getY() / (float) v.getHeight()) * 2 - 1);
+
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        mGlSurfaceView.queueEvent(new Runnable() {
+                            @Override
+                            public void run() {
+                                airRenderer.handleTouchPress(normalizedX,normalizedY);
+                            }
+                        });
+                    }
+                    else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                        mGlSurfaceView.queueEvent(new Runnable() {
+                            @Override
+                            public void run() {
+                                airRenderer.handleTouchMove(normalizedX,normalizedY);
+                            }
+                        });
+                    }
+                    return true;
+                }
+                return false;
+            }
+        });
+
         setContentView(mGlSurfaceView);
     }
 
