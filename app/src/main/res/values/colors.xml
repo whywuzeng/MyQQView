@@ -4,4 +4,14 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="mainbg">#F0EFF6</color>
+
+    <!--背景色-->
+    <color name="windowsBackground">#f7f7f7</color>
+
+    <color name="black">#000000</color>
+    <color name="dy_red">#fe2c55</color>
+    <color name="white">#ffffff</color>
+    <color name="seek_bar_thumb">#face15</color>
+    <color name="effect_panel_bg">#161823</color>
+    <color name="seek_bar_bg">#ffffff</color>
 </resources>

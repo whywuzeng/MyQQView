@@ -101,12 +101,14 @@ public class AirRenderer implements GLSurfaceView.Renderer {
         glViewport(0,0,width,height);
         MatrixHelper.perspectiveM(matrixFloats, 45, (float) width / (float) height, 1f, -10f);
         Matrix.setLookAtM(viewMatrix,0,0f,1.2f,2.2f,0f,0f,0f,0f,1f,0f);
+
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
         glClear(GL_COLOR_BUFFER_BIT);
 
+        //整个视角的 viewprojectionMatrix 矩阵
         Matrix.multiplyMM(viewProjectionMatrix,0,matrixFloats,0,viewMatrix,0);
 
         //抵消inverted放到这个矩阵

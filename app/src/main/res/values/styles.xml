@@ -1,11 +1,32 @@
 <resources>
-
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="Theme.Private" parent="Theme.AppCompat">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+
+        <!--背景色-->
+        <item name="android:windowBackground">@color/windowsBackground</item>
+
+        <!--没有title的-->
+        <item name="windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowNoTitle">true</item>
+
+        <!--Toolbar高度-->
+        <item name="actionBarSize">@dimen/len_48</item>
+
+    </style>
+
+    <style name="AppTheme.Base" parent="Theme.Private"/>
+
+
+    <style name="AppTheme.TransStatusBar.Base" parent="AppTheme.Base">
+        <!--去除顶部的状态栏-->
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowFrame">@null</item>
     </style>
 
 </resources>

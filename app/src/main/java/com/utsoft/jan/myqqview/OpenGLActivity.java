@@ -238,7 +238,7 @@ public class OpenGLActivity extends AppCompatActivity {
             glUseProgram(program);
 
             //得到这个位置
-//            uColorLoacation = glGetUniformLocation(program,U_COLOR);
+//          uColorLoacation = glGetUniformLocation(program,U_COLOR);
             aColorLocation =  glGetAttribLocation(program,A_Color);
             aPositionLocation = glGetAttribLocation(program,A_POSITION);
 

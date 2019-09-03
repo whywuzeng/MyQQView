@@ -55,8 +55,8 @@ public class ObjectBuilder {
 
         final Geometry.Circle circle = new Geometry.Circle(cylinder.center.translateY(translateY), cylinder.radius);
 
-        builder.append(cylinder, numPoints);
         builder.append(circle, numPoints);
+        builder.append(cylinder, numPoints);
 
        return builder.build();
 
