@@ -1,5 +1,28 @@
 package com.utsoft.jan.myqqview.douyin.common.preview.filter;
 
+import android.opengl.GLES11Ext;
+import android.opengl.GLES20;
+import android.util.Log;
+
+import com.utsoft.jan.myqqview.douyin.common.preview.RendererInfo;
+import com.utsoft.jan.myqqview.douyin.common.preview.TextrueProgram;
+
+import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
+import static android.opengl.GLES20.GL_FLOAT;
+import static android.opengl.GLES20.GL_TEXTURE0;
+import static android.opengl.GLES20.GL_TRIANGLE_STRIP;
+import static android.opengl.GLES20.glActiveTexture;
+import static android.opengl.GLES20.glBindTexture;
+import static android.opengl.GLES20.glClear;
+import static android.opengl.GLES20.glDeleteProgram;
+import static android.opengl.GLES20.glDisableVertexAttribArray;
+import static android.opengl.GLES20.glDrawArrays;
+import static android.opengl.GLES20.glEnableVertexAttribArray;
+import static android.opengl.GLES20.glGetAttribLocation;
+import static android.opengl.GLES20.glGetUniformLocation;
+import static android.opengl.GLES20.glUniformMatrix4fv;
+import static android.opengl.GLES20.glVertexAttribPointer;
+
 /**
  * Created by Administrator on 2019/9/3.
  * <p>
@@ -8,6 +31,15 @@ package com.utsoft.jan.myqqview.douyin.common.preview.filter;
  * com.utsoft.jan.myqqview.douyin.common.preview.filter
  */
 public class ImageFilter {
+
+    public static String getFragmentCode() {
+        return FRAGMENT_CODE;
+    }
+
+    public static String getVertexCode() {
+        return VERTEX_CODE;
+    }
+
     private static final String FRAGMENT_CODE =
             "#extension GL_OES_EGL_image_external : require\n" +
                     "precision mediump float;\n" +
@@ -27,5 +59,120 @@ public class ImageFilter {
                     "   vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
                     "}\n";
 
+    protected RendererInfo mRendererInfo = new RendererInfo();
 
+    private ThreadLocal<TextrueProgram> mProgram = new ThreadLocal<>();
+
+    protected int aPositionLocation;
+
+    protected int aTextureCoordLocation;
+
+    protected int uTexMatrixLocation;
+
+    protected int uTextureLocation;
+
+    protected int mWidth;
+
+    protected int mHeight;
+
+    public void init(){
+        if (mProgram.get() == null)
+        {
+            mProgram.set(new TextrueProgram(getVertexCode(),getFragmentCode()));
+            onInit();
+        }
+    }
+
+    private void onInit() {
+        initVertexArgument();
+        initFragmentArgument();
+    }
+
+    private int getProgram(){
+        return mProgram.get().getmProgramId();
+    }
+
+    private void initVertexArgument() {
+        aPositionLocation = glGetAttribLocation(getProgram(),"aPosition");
+        aTextureCoordLocation = glGetAttribLocation(getProgram(),"aTextureCoord");
+        uTexMatrixLocation = glGetUniformLocation(getProgram(),"uTexMatrix");
+    }
+
+    private void initFragmentArgument() {
+        uTextureLocation = glGetUniformLocation(getProgram(),"uTexture");
+    }
+
+    protected void enableArguments(){
+        glEnableVertexAttribArray(aPositionLocation);
+        glEnableVertexAttribArray(aTextureCoordLocation);
+    }
+
+    protected void disableArguments(){
+        glDisableVertexAttribArray(aPositionLocation);
+        glDisableVertexAttribArray(aTextureCoordLocation);
+    }
+
+    protected void setFragmentAttrs() {
+
+    }
+
+    protected void setVertexAttrs() {
+
+    }
+
+    protected void onDraw(int textureId,float[] texMatrix){
+        setVertexAttrs();
+        setFragmentAttrs();
+        glUniformMatrix4fv(uTexMatrixLocation,1,false,texMatrix,0);
+        checkGlError("glUniformMatrix4fv");
+        mRendererInfo.getRectVertex().position(0);
+        glVertexAttribPointer(aPositionLocation,2,GL_FLOAT,false,0,mRendererInfo.getRectVertex());
+        checkGlError("glVertexAttribPointer");
+        mRendererInfo.getTexVertext().position(0);
+        glVertexAttribPointer(aTextureCoordLocation,2,GL_FLOAT,false,0,mRendererInfo.getTexVertext());
+        checkGlError("glVertexAttribPointer");
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,textureId);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glDrawArrays(GL_TRIANGLE_STRIP,0,4);
+    }
+
+    protected void onDraw(int textureId,float[] texMatrix,int width,int height){
+        mWidth = width;
+        mHeight = height;
+        onDraw(textureId,texMatrix);
+    }
+
+    public void draw(int textureId,float[] texMatrix,int width,int height){
+        if (mProgram == null || textureId == -1)
+        {
+            return;
+        }
+        mProgram.get().useProgram();
+        checkGlError("useProgram");
+        enableArguments();
+        onDraw(textureId,texMatrix,width,height);
+        disableArguments();
+    }
+
+    /**
+     * Checks to see if a GLES error has been raised.
+     */
+    public static void checkGlError(String op) {
+        int error = GLES20.glGetError();
+        if (error != GLES20.GL_NO_ERROR) {
+            String msg = op + ": glError 0x" + Integer.toHexString(error);
+            Log.e("GLError", msg);
+        }
+    }
+
+    public void release(){
+        if (mProgram == null||mProgram.get() == null)
+        {
+            return;
+        }
+
+        glDeleteProgram(mProgram.get().getmProgramId());
+        mProgram.set(null);
+    }
 }

@@ -6,6 +6,8 @@ import android.opengl.EGLContext;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 
+import com.utsoft.jan.myqqview.douyin.common.preview.filter.ImageFilter;
+
 /**
  * Created by Administrator on 2019/9/3.
  * <p>
@@ -14,6 +16,8 @@ import android.util.AttributeSet;
  * com.utsoft.jan.myqqview.douyin.common.view.record
  */
 public class RecordSurfaceView extends GLSurfaceView implements SurfaceTexture.OnFrameAvailableListener {
+
+    private RecordRender mRenderer;
 
     public void setSurfaceCreatedCallback(OnSurfaceCreatedCallback mSurfaceCreatedCallback) {
         this.mSurfaceCreatedCallback = mSurfaceCreatedCallback;
@@ -33,8 +37,10 @@ public class RecordSurfaceView extends GLSurfaceView implements SurfaceTexture.O
 
     private void setup() {
         //初始化 render
+        mRenderer =  new RecordRender(this);
         setEGLContextClientVersion(2);
-
+        setRenderer(mRenderer);
+        setRenderMode(RENDERMODE_WHEN_DIRTY);
     }
 
     void onSurfaceCreated(SurfaceTexture texture, EGLContext context) {
@@ -47,5 +53,13 @@ public class RecordSurfaceView extends GLSurfaceView implements SurfaceTexture.O
     @Override
     public void onFrameAvailable(SurfaceTexture surfaceTexture) {
         requestRender();
+    }
+
+    public void setFrameListener(onFrameAvailableListener frameListener){
+        mRenderer.setFrameListener(frameListener);
+    }
+
+    public void setFilter(ImageFilter filter){
+        mRenderer.setFilter(filter);
     }
 }
