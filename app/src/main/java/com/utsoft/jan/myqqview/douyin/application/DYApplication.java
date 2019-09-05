@@ -2,6 +2,7 @@ package com.utsoft.jan.myqqview.douyin.application;
 
 import android.app.Application;
 
+import com.utsoft.jan.common.app.AppProfile;
 import com.utsoft.jan.myqqview.douyin.permission.PermissionManager;
 
 

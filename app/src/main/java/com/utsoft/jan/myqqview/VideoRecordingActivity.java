@@ -7,12 +7,15 @@ import android.graphics.SurfaceTexture;
 import android.opengl.EGLContext;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.utsoft.jan.common.app.PresenterActivity;
 import com.utsoft.jan.myqqview.douyin.common.camera.CameraCompat;
+import com.utsoft.jan.myqqview.douyin.common.view.RecordButton;
 import com.utsoft.jan.myqqview.douyin.common.view.record.OnSurfaceCreatedCallback;
 import com.utsoft.jan.myqqview.douyin.common.view.record.RecordSurfaceView;
+import com.utsoft.jan.myqqview.douyin.recoder.persenter.RecordContract;
+import com.utsoft.jan.myqqview.douyin.recoder.persenter.RecordPersenter;
 
 /**
  * Created by Administrator on 2019/9/3.
@@ -21,7 +24,7 @@ import com.utsoft.jan.myqqview.douyin.common.view.record.RecordSurfaceView;
  * <p>
  * com.utsoft.jan.myqqview
  */
-public class VideoRecordingActivity extends AppCompatActivity implements OnSurfaceCreatedCallback {
+public class VideoRecordingActivity extends PresenterActivity<RecordContract.Presenter> implements OnSurfaceCreatedCallback, RecordButton.OnRecordListener,RecordContract.View {
 
     private RecordSurfaceView glSurfaceView;
 
@@ -29,6 +32,8 @@ public class VideoRecordingActivity extends AppCompatActivity implements OnSurfa
     private boolean isSender;
     private ActivityManager activityManager;
     private CameraCompat cameraCompat;
+    private RecordButton recordButton;
+    private EGLContext mEGLContext;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,6 +43,9 @@ public class VideoRecordingActivity extends AppCompatActivity implements OnSurfa
         cameraCompat = CameraCompat.newInstance(this);
         glSurfaceView = findViewById(R.id.sv_record);
         glSurfaceView.setSurfaceCreatedCallback(this);
+        recordButton = findViewById(R.id.btn_record);
+
+        recordButton.setOnRecordListener(this);
 
         activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         final ConfigurationInfo info = activityManager.getDeviceConfigurationInfo();
@@ -49,6 +57,11 @@ public class VideoRecordingActivity extends AppCompatActivity implements OnSurfa
         else {
             Log.i(TAG, "onCreate: 不支持");
         }
+    }
+
+    @Override
+    protected void initPresenter() {
+        mPresenter = new RecordPersenter(this);
     }
 
     @Override
@@ -67,14 +80,32 @@ public class VideoRecordingActivity extends AppCompatActivity implements OnSurfa
 
 
     @Override
-    public void onSurfaceCreated(final SurfaceTexture texture, EGLContext context) {
+    public void onSurfaceCreated(final SurfaceTexture texture, final EGLContext context) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                cameraCompat.setSurfaceTexture(texture);
                 cameraCompat.startPreview();
+                cameraCompat.setSurfaceTexture(texture);
+                mEGLContext = context;
             }
         });
+    }
+
+    //点击 record按钮录制开始
+    @Override
+    public void OnRecordStart() {
+        mPresenter.startRecording(mEGLContext,cameraCompat.getOutputSize().width,cameraCompat.getOutputSize().height);
+    }
+
+    // record 录制结束
+    @Override
+    public void OnRecordStop() {
+
+    }
+
+    @Override
+    public void showLoading() {
+
     }
 
 }

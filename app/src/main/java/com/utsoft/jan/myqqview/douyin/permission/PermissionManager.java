@@ -4,7 +4,7 @@ import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 
-import com.utsoft.jan.myqqview.douyin.application.AppProfile;
+import com.utsoft.jan.common.app.AppProfile;
 
 import java.util.ArrayList;
 import java.util.List;

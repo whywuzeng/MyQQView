@@ -15,7 +15,7 @@ import android.hardware.camera2.params.StreamConfigurationMap;
 import android.support.annotation.NonNull;
 import android.view.Surface;
 
-import com.utsoft.jan.myqqview.douyin.common.utils.LogUtil;
+import com.utsoft.jan.common.utils.LogUtil;
 import com.utsoft.jan.myqqview.douyin.permission.PermissionManager;
 import com.utsoft.jan.myqqview.douyin.permission.SimplePermissionCallback;
 
@@ -183,12 +183,15 @@ public class CameraCompatV21 extends CameraCompat {
     @Override
     public void onStopPreview() {
         abortSession();
-        mCamera.close();
-        mCamera = null;
+        if (mCamera!=null){
+            mCamera.close();
+            mCamera = null;
+        }
     }
 
     @Override
     protected void onOpenCamera(@CameraType final int cameraType) {
+
         PermissionManager.instance().checkPermission(new String[]{Manifest.permission.CAMERA},
                 new SimplePermissionCallback() {
                     @Override
@@ -202,6 +205,9 @@ public class CameraCompatV21 extends CameraCompat {
     @SuppressLint("MissingPermission")
     private void initialize(@CameraType int cameraType) {
         try {
+            //cameraId 是一个标识，标识当前要打开的camera
+            //callback 是一个状态回调，当前camera被打开的时候，这个状态回调会被触发的。
+            //handler 是传入的一个执行耗时操作的handler
             mManager.openCamera(cameraType == FRONT_CAMERA ? getFrontCameraIdV21() :
                             getBackCameraIdV21(),
                     mStateCallback, null);

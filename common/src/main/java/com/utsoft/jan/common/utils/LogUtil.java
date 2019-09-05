@@ -1,4 +1,4 @@
-package com.utsoft.jan.myqqview.douyin.common.utils;
+package com.utsoft.jan.common.utils;
 
 import android.util.Log;
 

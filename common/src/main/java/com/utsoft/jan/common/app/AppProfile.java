@@ -1,4 +1,4 @@
-package com.utsoft.jan.myqqview.douyin.application;
+package com.utsoft.jan.common.app;
 
 import android.app.Application;
 

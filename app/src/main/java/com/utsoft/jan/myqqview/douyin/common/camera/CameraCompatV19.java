@@ -4,7 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.hardware.Camera;
 
-import com.utsoft.jan.myqqview.douyin.common.utils.LogUtil;
+import com.utsoft.jan.common.utils.LogUtil;
 import com.utsoft.jan.myqqview.douyin.permission.PermissionManager;
 import com.utsoft.jan.myqqview.douyin.permission.SimplePermissionCallback;
 

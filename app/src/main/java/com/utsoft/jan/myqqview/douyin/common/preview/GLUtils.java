@@ -2,7 +2,7 @@ package com.utsoft.jan.myqqview.douyin.common.preview;
 
 import android.opengl.GLES11Ext;
 
-import com.utsoft.jan.myqqview.douyin.common.utils.LogUtil;
+import com.utsoft.jan.common.utils.LogUtil;
 
 import static android.opengl.GLES20.GL_CLAMP_TO_EDGE;
 import static android.opengl.GLES20.GL_COMPILE_STATUS;
@@ -43,9 +43,12 @@ public class GLUtils {
     public static int createTextureObject(int textureTarget) {
         //textureTarget gltextureView 地址
         int[] textures = new int[1];
+        //n 指定要生成的纹理名称的数量。
         glGenTextures(1, textures, 0);
         final int textId = textures[0];
+        //允许您创建或使用命名纹理。
         glBindTexture(textureTarget, textId);
+
         glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER,
                 GL_LINEAR);
         glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER,
