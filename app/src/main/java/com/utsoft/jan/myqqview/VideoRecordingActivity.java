@@ -46,6 +46,7 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
         recordButton = findViewById(R.id.btn_record);
 
         recordButton.setOnRecordListener(this);
+        initPresenter();
 
         activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         final ConfigurationInfo info = activityManager.getDeviceConfigurationInfo();
@@ -84,8 +85,8 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                cameraCompat.startPreview();
                 cameraCompat.setSurfaceTexture(texture);
+                cameraCompat.startPreview();
                 mEGLContext = context;
             }
         });
@@ -108,4 +109,8 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
 
     }
 
+    @Override
+    public RecordSurfaceView getSurface() {
+        return glSurfaceView;
+    }
 }

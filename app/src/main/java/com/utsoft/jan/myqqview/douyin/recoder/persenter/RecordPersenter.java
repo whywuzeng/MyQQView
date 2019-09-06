@@ -37,10 +37,10 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
     public RecordPersenter(RecordContract.View mView) {
         super(mView);
 
-        init();
+        init(mView);
     }
 
-    private void init() {
+    private void init(RecordContract.View mView) {
         PermissionManager.instance().checkPermission(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO}, new RecordPermissionGrantedListener());
         mediaRecoder = new MediaRecoder(3, this);
@@ -79,13 +79,13 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
      */
     @Override
     public void startRecording(EGLContext mEGLContext, int width, int height) {
-        init();
         if (!mediaRecoder.start(mEGLContext,width,height,mMode)) {
             Toast.makeText(AppProfile.getContext(), "视频已达到最大长度", Toast.LENGTH_SHORT).show();
             return;
         }
 
         mStarted = true;
+        mView.getSurface().setFrameListener(mediaRecoder);
     }
 
     @Override
@@ -95,4 +95,5 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
 
         mediaRecoder.stop();
     }
+
 }

@@ -1,5 +1,6 @@
 package com.utsoft.jan.myqqview.douyin.common.preview.filter;
 
+import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.util.Log;
 
@@ -11,6 +12,7 @@ import static android.opengl.GLES20.GL_FLOAT;
 import static android.opengl.GLES20.GL_TEXTURE0;
 import static android.opengl.GLES20.GL_TRIANGLE_STRIP;
 import static android.opengl.GLES20.glActiveTexture;
+import static android.opengl.GLES20.glBindTexture;
 import static android.opengl.GLES20.glClear;
 import static android.opengl.GLES20.glDeleteProgram;
 import static android.opengl.GLES20.glDisableVertexAttribArray;
@@ -130,7 +132,8 @@ public class ImageFilter {
         glVertexAttribPointer(aTextureCoordLocation,2,GL_FLOAT,false,0,mRendererInfo.getTexVertext());
         checkGlError("glVertexAttribPointer");
         glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,textureId);
+        //绑定好 申请textureId 绑定好纹理类型.已经绑定一次了。
+        glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,textureId);
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawArrays(GL_TRIANGLE_STRIP,0,4);
     }

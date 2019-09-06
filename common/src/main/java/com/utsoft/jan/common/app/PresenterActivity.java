@@ -21,7 +21,6 @@ public abstract class PresenterActivity<Presenter extends BaseContract.Presenter
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initPresenter();
     }
 
     protected abstract void initPresenter();

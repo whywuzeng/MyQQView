@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 
 import com.utsoft.jan.common.utils.FileUtils;
 import com.utsoft.jan.myqqview.douyin.common.C;
-import com.utsoft.jan.myqqview.douyin.common.recoder.video.VideoConfig;
+import com.utsoft.jan.myqqview.douyin.common.recoder.audio.AudioConfig;
 import com.utsoft.jan.myqqview.douyin.common.recoder.video.VideoFrameData;
 import com.utsoft.jan.myqqview.douyin.common.view.record.onFrameAvailableListener;
 
@@ -26,14 +26,18 @@ public class MediaRecoder implements onFrameAvailableListener, OnRecordFinishLis
     private  int remainDuration;
     private final int maxDuration;
     private VideoRecoder videoRecoder;
+    private AudioRecoder audioRecoder;
 
     public MediaRecoder(int seconds, @NonNull OnRecordFinishListener listener)
     {
         mFinishListener = listener;
-        videoRecoder = new VideoRecoder();
+        //videoRecoder = new VideoRecoder();
+
+        audioRecoder = new AudioRecoder();
         remainDuration = seconds * C.SECOND_IN_US;
         maxDuration = remainDuration;
-        videoRecoder.setOnRecordFinishListener(this);
+
+        //videoRecoder.setOnRecordFinishListener(this);
     }
 
     public boolean start(EGLContext context, int width, int height, @C.SpeedMode int mode){
@@ -41,37 +45,46 @@ public class MediaRecoder implements onFrameAvailableListener, OnRecordFinishLis
             return  false;
         }
 
-        FileUtils.createFile(C.VIDEO_TEMP_FILE_NAME);
-        final VideoConfig video = new VideoConfig(context, width, height, C.VideoParams.BIT_RATE,C.VIDEO_TEMP_FILE_NAME);
-        video.setFactor(MediaConfig.getSpeedFactor(mode));
-        video.setMaxDuration(remainDuration);
+        //FileUtils.createFile(C.VIDEO_TEMP_FILE_NAME);
+        //final VideoConfig video = new VideoConfig(context, width, height, C.VideoParams.BIT_RATE,C.VIDEO_TEMP_FILE_NAME);
+        //video.setFactor(MediaConfig.getSpeedFactor(mode));
+        //video.setMaxDuration(remainDuration);
+        //videoRecoder.configure(video);
 
-        videoRecoder.configure(video);
+        FileUtils.createFile(C.AUDIO_TEMP_FILE_NAME);
+        final AudioConfig audioConfig = new AudioConfig(C.AudioParams.SAMPLE_RATE, C.AudioParams.SAMPLE_PER_FRAME, C.AUDIO_TEMP_FILE_NAME);
+        audioConfig.setMaxDuration(remainDuration);
+        audioConfig.setSpeedMode(mode);
+        audioRecoder.configure(audioConfig);
 
         try {
-            videoRecoder.prepareCodec();
+            //videoRecoder.prepareCodec();
+            audioRecoder.prepareCodec();
         } catch (IOException e) {
             e.printStackTrace();
-            videoRecoder.shutdown();
+            //videoRecoder.shutdown();
+            audioRecoder.shutdown();
             return false;
         }
+        audioRecoder.start();
 
-        videoRecoder.start();
+        //videoRecoder.start();
         return true;
 
     }
 
     @Override
     public void onFrameAvailable(VideoFrameData frameData) {
-        videoRecoder.frameAvailable(frameData);
+        //videoRecoder.frameAvailable(frameData);
     }
 
     public void setProgressListener(OnRecordProgressListener listener){
-        videoRecoder.setProgressListener(listener);
+        //videoRecoder.setProgressListener(listener);
     }
 
     public void stop() {
-        videoRecoder.stop();
+        audioRecoder.stop();
+        //videoRecoder.stop();
     }
 
     @Override

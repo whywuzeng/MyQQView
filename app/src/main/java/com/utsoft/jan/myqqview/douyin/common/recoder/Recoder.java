@@ -24,6 +24,7 @@ public interface Recoder<T> {
 
     void stop();
 
+    //Mediacodec 初始化工作
     void prepareCodec() throws IOException;
 
     void shutdown();

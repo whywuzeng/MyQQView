@@ -171,10 +171,13 @@ public class VideoRecoder implements Recoder<VideoConfig> {
     }
 
     public void frameAvailable(final VideoFrameData data){
-        if (started)
+        if (!started)
         {
             return;
         }
+
+        if (handler == null)
+            return;
 
         handler.post(new Runnable() {
             @Override

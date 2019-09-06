@@ -9,7 +9,7 @@ package com.utsoft.jan.common.factory.presenter;
  */
 public class BasePresenter<T extends BaseContract.View> implements BaseContract.Presenter{
 
-    private T mView;
+    protected T mView;
 
     //构造方法必须 传入view
     public BasePresenter(T mView){

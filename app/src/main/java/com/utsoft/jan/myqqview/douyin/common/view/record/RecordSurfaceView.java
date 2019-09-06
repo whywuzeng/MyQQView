@@ -40,6 +40,7 @@ public class RecordSurfaceView extends GLSurfaceView implements SurfaceTexture.O
         mRenderer =  new RecordRender(this);
         setEGLContextClientVersion(2);
         setRenderer(mRenderer);
+        //通过requestRender()方法主动请求重绘
         setRenderMode(RENDERMODE_WHEN_DIRTY);
     }
 
