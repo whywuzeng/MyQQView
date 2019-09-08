@@ -8,12 +8,15 @@ import android.opengl.EGLContext;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
 
 import com.utsoft.jan.common.app.PresenterActivity;
 import com.utsoft.jan.common.utils.LogUtil;
 import com.utsoft.jan.myqqview.douyin.common.camera.CameraCompat;
 import com.utsoft.jan.myqqview.douyin.common.view.ProgressView;
 import com.utsoft.jan.myqqview.douyin.common.view.RecordButton;
+import com.utsoft.jan.myqqview.douyin.common.view.progressbutton.MasterLayout;
 import com.utsoft.jan.myqqview.douyin.common.view.record.OnSurfaceCreatedCallback;
 import com.utsoft.jan.myqqview.douyin.common.view.record.RecordSurfaceView;
 import com.utsoft.jan.myqqview.douyin.recoder.persenter.RecordContract;
@@ -37,6 +40,8 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
     private RecordButton recordButton;
     private EGLContext mEGLContext;
     private ProgressView mProgressView;
+    public  MasterLayout masterLayout;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -51,6 +56,15 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
 
         recordButton.setOnRecordListener(this);
         initPresenter();
+        masterLayout = findViewById(R.id.MasterLayout01);
+
+        masterLayout.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initMaslayout();
+            }
+        });
+
 
         activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         final ConfigurationInfo info = activityManager.getDeviceConfigurationInfo();
@@ -61,6 +75,48 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
         }
         else {
             Log.i(TAG, "onCreate: 不支持");
+        }
+    }
+
+    private void initMaslayout() {
+        masterLayout.animation(); //Need to call this method for animation and progression
+
+        if (MasterLayout.flg_frmwrk_mode == 1) {
+
+            //Start state. Call any method that you want to execute
+
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    // TODO Auto-generated method stub
+                }
+            });
+        }
+        if (MasterLayout.flg_frmwrk_mode == 2) {
+
+            //Running state. Call any method that you want to execute
+
+            masterLayout.reset();
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    // TODO Auto-generated method stub
+                }
+            });
+        }
+        if (MasterLayout.flg_frmwrk_mode == 3) {
+
+            //End state. Call any method that you want to execute.
+
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    // TODO Auto-generated method stub
+                }
+            });
         }
     }
 
