@@ -37,6 +37,9 @@ public class C {
         public static final int SAMPLE_RATE = 44100;
 
         public static final String MIME_TYPE = "audio/mp4a-latm";
+
+        //0.02 秒
+        public static final float framePreTime = 0.02f * 1000000;
     }
 
 

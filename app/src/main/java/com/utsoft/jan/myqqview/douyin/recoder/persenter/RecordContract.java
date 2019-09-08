@@ -18,6 +18,9 @@ public class RecordContract {
 
         RecordSurfaceView getSurface();
 
+        void OnRecordProgress(float progress);
+
+        void addProgress(float progress);
     }
 
     public interface Presenter extends BaseContract.Presenter {

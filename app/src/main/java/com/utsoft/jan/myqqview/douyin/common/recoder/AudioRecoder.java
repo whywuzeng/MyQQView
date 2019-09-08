@@ -39,6 +39,9 @@ public class AudioRecoder implements Recoder<AudioConfig>, Runnable {
     private BufferedOutputStream bufferedOutputStream;
     private Handler recordHandler;
     private Handler encodeHandler;
+    private long maxDuration;
+    private int duration;
+    private float preFrameDuration;
 
     public AudioRecoder() {
 
@@ -65,7 +68,9 @@ public class AudioRecoder implements Recoder<AudioConfig>, Runnable {
 
         recordHandler = ThreadUtil.newHandlerThread("record");
         encodeHandler = ThreadUtil.newHandlerThread("encode");
-
+        maxDuration = config.getMaxDuration();
+        duration = 0;
+        preFrameDuration = C.AudioParams.framePreTime;
     }
 
     private void loop() {
@@ -245,9 +250,14 @@ public class AudioRecoder implements Recoder<AudioConfig>, Runnable {
                 bufferedOutputStream.write(data,0,data.length);
                 bufferedOutputStream.flush();
                 //时间累积加
+                duration+=preFrameDuration;
             } catch (IOException e) {
                 e.printStackTrace();
 
+            }
+            if (duration>=maxDuration)
+            {
+                stop();
             }
             //释放 outputbuffer 状态
             encoder.releaseOutputBuffer(encoderStatus,false);

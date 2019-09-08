@@ -10,7 +10,9 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.utsoft.jan.common.app.PresenterActivity;
+import com.utsoft.jan.common.utils.LogUtil;
 import com.utsoft.jan.myqqview.douyin.common.camera.CameraCompat;
+import com.utsoft.jan.myqqview.douyin.common.view.ProgressView;
 import com.utsoft.jan.myqqview.douyin.common.view.RecordButton;
 import com.utsoft.jan.myqqview.douyin.common.view.record.OnSurfaceCreatedCallback;
 import com.utsoft.jan.myqqview.douyin.common.view.record.RecordSurfaceView;
@@ -24,7 +26,7 @@ import com.utsoft.jan.myqqview.douyin.recoder.persenter.RecordPersenter;
  * <p>
  * com.utsoft.jan.myqqview
  */
-public class VideoRecordingActivity extends PresenterActivity<RecordContract.Presenter> implements OnSurfaceCreatedCallback, RecordButton.OnRecordListener,RecordContract.View {
+public class VideoRecordingActivity extends PresenterActivity<RecordContract.Presenter> implements OnSurfaceCreatedCallback, RecordButton.OnRecordListener, RecordContract.View {
 
     private RecordSurfaceView glSurfaceView;
 
@@ -34,6 +36,7 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
     private CameraCompat cameraCompat;
     private RecordButton recordButton;
     private EGLContext mEGLContext;
+    private ProgressView mProgressView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,6 +47,7 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
         glSurfaceView = findViewById(R.id.sv_record);
         glSurfaceView.setSurfaceCreatedCallback(this);
         recordButton = findViewById(R.id.btn_record);
+        mProgressView = findViewById(R.id.pv_progress);
 
         recordButton.setOnRecordListener(this);
         initPresenter();
@@ -95,7 +99,7 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
     //点击 record按钮录制开始
     @Override
     public void OnRecordStart() {
-        mPresenter.startRecording(mEGLContext,cameraCompat.getOutputSize().width,cameraCompat.getOutputSize().height);
+        mPresenter.startRecording(mEGLContext, cameraCompat.getOutputSize().width, cameraCompat.getOutputSize().height);
     }
 
     // record 录制结束
@@ -112,5 +116,28 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
     @Override
     public RecordSurfaceView getSurface() {
         return glSurfaceView;
+    }
+
+    //录制回调progress
+    @Override
+    public void OnRecordProgress(final float progress) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+
+                mProgressView.setLoadingProgress( progress);
+                LogUtil.e("progress:"+progress);
+            }
+        });
+    }
+
+    @Override
+    public void addProgress(final float progress) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mProgressView.addProgress((int) progress);
+            }
+        });
     }
 }
