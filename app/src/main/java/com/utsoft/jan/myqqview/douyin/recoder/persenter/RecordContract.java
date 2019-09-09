@@ -28,5 +28,7 @@ public class RecordContract {
 
         void stopRecording();
 
+        //屏幕一黑 停止录制
+        void stopRecord();
     }
 }

@@ -196,7 +196,10 @@ public class CameraCompatV21 extends CameraCompat {
                 new SimplePermissionCallback() {
                     @Override
                     public void onPermissionGranted(String permission) {
-                        initialize(cameraType);
+                        if(permission.equals(Manifest.permission.CAMERA))
+                        {
+                            initialize(cameraType);
+                        }
                     }
                 });
     }

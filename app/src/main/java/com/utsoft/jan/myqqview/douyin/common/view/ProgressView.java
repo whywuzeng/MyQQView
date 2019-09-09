@@ -40,7 +40,7 @@ public class ProgressView extends View {
 
     private float dividerWidth;
     private float total;
-    private List<Integer> progressList = new ArrayList<>();
+    private List<Float> progressList = new ArrayList<>();
     //old value
     private float loadingProgress;
 
@@ -80,10 +80,10 @@ public class ProgressView extends View {
 
     //画个白色divider
     private void drawDivider(Canvas canvas) {
-
+        float rightWidth =0;
         mPaint.setColor(DIVIDERCOLOR);
-        for (int progress : progressList) {
-            float rightWidth = progress * getMeasuredWidth();
+        for (float progress : progressList) {
+            rightWidth = (progress * getMeasuredWidth()) + rightWidth;
             canvas.drawRect(new RectF(rightWidth - dividerWidth, 0, rightWidth, getMeasuredHeight()), mPaint);
         }
     }
@@ -93,7 +93,7 @@ public class ProgressView extends View {
         //分百之多少.
         total = 0;
         //先加上以前的progress
-        for (int progress : progressList) {
+        for (float progress : progressList) {
             total += progress;
         }
         //然后 加上 实时变化的loadingProgresss
@@ -115,7 +115,7 @@ public class ProgressView extends View {
     }
 
     //这一阶段已经结束
-    public void addProgress(int progress){
+    public void addProgress(float progress) {
         //这个值要重置为零
         loadingProgress = 0;
         progressList.add( progress);

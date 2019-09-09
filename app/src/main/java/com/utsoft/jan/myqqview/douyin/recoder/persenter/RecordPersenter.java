@@ -10,6 +10,7 @@ import com.utsoft.jan.common.ffmpeg.VideoCmdCallback;
 import com.utsoft.jan.common.ffmpeg.VideoCommand;
 import com.utsoft.jan.common.ffmpeg.VideoQueue;
 import com.utsoft.jan.common.utils.FileUtils;
+import com.utsoft.jan.common.utils.LogUtil;
 import com.utsoft.jan.common.utils.StorageUtil;
 import com.utsoft.jan.myqqview.douyin.common.C;
 import com.utsoft.jan.myqqview.douyin.common.recoder.ClipInfo;
@@ -56,7 +57,7 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
     private void init(RecordContract.View mView) {
         PermissionManager.instance().checkPermission(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO}, new RecordPermissionGrantedListener());
-        mediaRecoder = new MediaRecoder(3, this);
+        mediaRecoder = new MediaRecoder(15, this);
         mediaRecoder.setProgressListener(this);
         mQueue = new VideoQueue();
     }
@@ -68,13 +69,12 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
         switch (info.getType()) {
             case C.VIDEO:
                 videoInfo = info;
+                mergeVideoAudio();
                 break;
             case C.AUDIO:
                 audioInfo = info;
                 break;
         }
-
-        mergeVideoAudio();
     }
 
     //合并Video Audio
@@ -89,10 +89,30 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
             public void onCommandFinish(boolean success) {
                 mView.addProgress(videoInfo.getDuration() * 1.0f / mediaRecoder.getMaxDuration());
                 videoList.add(currentFile);
+                LogUtil.e("videoList"+videoList.toString());
+                mergeVideoList(videoInfo);
                 FileUtils.deleteFile(audioInfo.getFileName());
                 FileUtils.deleteFile(videoInfo.getFileName());
-                audioInfo = null;
-                videoInfo = null;
+            }
+        });
+    }
+
+    private void mergeVideoList(final ClipInfo videoInfo) {
+
+        String mergeVideo = generateFileName("mergeVideo");
+        FileUtils.createFile(mergeVideo);
+        final VideoCommand videoCommand = VideoCommand.mergeVideo(videoList, mergeVideo);
+        mQueue.execCommand(videoCommand.toArray(), new VideoCmdCallback() {
+            @Override
+            public void onCommandFinish(boolean success) {
+                if (videoInfo.getDuration()>=mediaRecoder.getMaxDuration())
+                {
+                    for (String fname : videoList) {
+                        FileUtils.deleteFile(fname);
+                    }
+                    RecordPersenter.this.audioInfo = null;
+                    RecordPersenter.this.videoInfo = null;
+                }
             }
         });
     }
@@ -143,8 +163,18 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
         mediaRecoder.stop();
     }
 
+    //屏幕一黑强制停止
+    @Override
+    public void stopRecord(){
+        mediaRecoder.stop();
+    }
+
     private String generateFileName() {
         return StorageUtil.getExternalStoragePath() + File.separator + "temp" + videoList.size() + ".mp4";
+    }
+
+    private String generateFileName(String fileName) {
+        return StorageUtil.getExternalStoragePath() + File.separator + fileName + ".mp4";
     }
 
 }

@@ -134,8 +134,9 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
 
     @Override
     protected void onPause() {
+        mPresenter.stopRecord();
         glSurfaceView.onPause();
-        cameraCompat.onStopPreview();
+        cameraCompat.stopPreview(true);
         super.onPause();
     }
 
@@ -161,7 +162,7 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
     // record 录制结束
     @Override
     public void OnRecordStop() {
-
+        mPresenter.stopRecording();
     }
 
     @Override
@@ -192,7 +193,7 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mProgressView.addProgress((int) progress);
+                mProgressView.addProgress( progress);
             }
         });
     }
