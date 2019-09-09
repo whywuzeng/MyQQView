@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.ConfigurationInfo;
 import android.graphics.SurfaceTexture;
 import android.opengl.EGLContext;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -41,6 +42,7 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
     private EGLContext mEGLContext;
     private ProgressView mProgressView;
     public  MasterLayout masterLayout;
+    private DownLoadSigTask downLoadSigTask;
 
 
     @Override
@@ -92,11 +94,16 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
                     // TODO Auto-generated method stub
                 }
             });
+
+            downLoadSigTask = new DownLoadSigTask();
+
+            downLoadSigTask.execute();
         }
         if (MasterLayout.flg_frmwrk_mode == 2) {
 
             //Running state. Call any method that you want to execute
 
+            downLoadSigTask.cancel(true);
             masterLayout.reset();
             runOnUiThread(new Runnable() {
 
@@ -119,6 +126,50 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
             });
         }
     }
+
+     class DownLoadSigTask extends AsyncTask<String, Integer, String> {
+
+
+        @Override
+        protected void onPreExecute() {
+
+        }
+
+
+        @Override
+        protected String doInBackground(final String... args) {
+
+            //Creating dummy task and updating progress
+
+            for (int i = 0; i <= 100; i++) {
+                try {
+                    Thread.sleep(50);
+
+                } catch (InterruptedException e) {
+
+                    e.printStackTrace();
+                }
+                publishProgress(i);
+
+            }
+
+
+            return null;
+        }
+
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) {
+
+            //publishing progress to progress arc
+
+            masterLayout.getCusview().setupprogress(progress[0]);
+        }
+
+
+
+    }
+
 
     @Override
     protected void initPresenter() {

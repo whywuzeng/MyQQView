@@ -23,7 +23,11 @@ import android.widget.ImageView;
 
 public class MasterLayout extends FrameLayout implements OnClickListener {
 
-	public CusImage cusview;
+    public CusImage getCusview() {
+        return cusview;
+    }
+
+    public CusImage cusview;
 	public int pix = 0;
 	public RectF rect;
 
@@ -81,6 +85,7 @@ public class MasterLayout extends FrameLayout implements OnClickListener {
 		arc_image = new ImageView(getContext());
 
 		fillcircle = new ImageView(getContext());
+
 		cusview.setClickable(false);
 		buttonimage.setClickable(false);
 		full_circle_image.setClickable(false);
@@ -95,7 +100,7 @@ public class MasterLayout extends FrameLayout implements OnClickListener {
 	private void setpaint() {
 
 		// Setting up color
-
+        //最外圈蓝色 #00A1EA   ANTI_ALIAS_FLAG 是使位图抗锯齿的标志
 		stroke_color = new Paint(Paint.ANTI_ALIAS_FLAG);
 		stroke_color.setAntiAlias(true);
 		stroke_color.setColor(Color.rgb(0, 161, 234)); // Edit this to change
@@ -112,6 +117,8 @@ public class MasterLayout extends FrameLayout implements OnClickListener {
 		final_icon_color = new Paint(Paint.ANTI_ALIAS_FLAG);
 		final_icon_color.setColor(Color.WHITE); // Edit this to change the final
 												// icon color
+
+        //Paint.Style.STROKE  描边,只绘制图形轮廓
 		final_icon_color.setStrokeWidth(12);
 		final_icon_color.setStyle(Paint.Style.STROKE);
 		final_icon_color.setAntiAlias(true);
@@ -119,6 +126,7 @@ public class MasterLayout extends FrameLayout implements OnClickListener {
 		fill_color = new Paint(Paint.ANTI_ALIAS_FLAG);
 		fill_color.setColor(Color.rgb(0, 161, 234)); // Edit this to change the
 														// circle fill color
+        // 设置填充样式  绘制图形轮廓
 		fill_color.setStyle(Paint.Style.FILL_AND_STROKE);
 		fill_color.setAntiAlias(true);
 
@@ -341,7 +349,7 @@ public class MasterLayout extends FrameLayout implements OnClickListener {
 		third_icon_bmp = Bitmap.createBitmap(pix, pix, conf); // Bitmap to draw
 																// third icon(
 																// Default -
-																// Tick )
+																// Tick ) 勾
 
 		Canvas first_icon_canvas = new Canvas(first_icon_bmp);
 		Canvas second_icon_canvas = new Canvas(second_icon_bmp);

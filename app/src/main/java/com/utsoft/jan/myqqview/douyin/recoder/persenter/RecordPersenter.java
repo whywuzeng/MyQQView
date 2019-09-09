@@ -69,12 +69,15 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
         switch (info.getType()) {
             case C.VIDEO:
                 videoInfo = info;
-                mergeVideoAudio();
+                LogUtil.e("C.VIDEO");
                 break;
             case C.AUDIO:
                 audioInfo = info;
+                LogUtil.e("C.AUDIO");
                 break;
         }
+        LogUtil.e("第一次video录制回调进入方法! info:打印"+info.getType());
+        mergeVideoAudio();
     }
 
     //合并Video Audio
@@ -83,21 +86,27 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
             return;
         final String currentFile = generateFileName();
         final VideoCommand videoCommand = VideoCommand.mergeVideoAudio(videoInfo.getFileName(), audioInfo.getFileName(), currentFile);
+        LogUtil.e("第一次video录制回调进入方法!");
 
         mQueue.execCommand(videoCommand.toArray(), new VideoCmdCallback() {
             @Override
             public void onCommandFinish(boolean success) {
+                LogUtil.e("第一次录制有没有成功!");
                 mView.addProgress(videoInfo.getDuration() * 1.0f / mediaRecoder.getMaxDuration());
                 videoList.add(currentFile);
                 LogUtil.e("videoList"+videoList.toString());
-                mergeVideoList(videoInfo);
+                final long tmpDuration = videoInfo.getDuration();
+                mergeVideoList(tmpDuration);
                 FileUtils.deleteFile(audioInfo.getFileName());
                 FileUtils.deleteFile(videoInfo.getFileName());
+                //这里置空 前面两个线程回调才能成功.
+                RecordPersenter.this.audioInfo = null;
+                RecordPersenter.this.videoInfo = null;
             }
         });
     }
 
-    private void mergeVideoList(final ClipInfo videoInfo) {
+    private void mergeVideoList(final long videoInfo) {
 
         String mergeVideo = generateFileName("mergeVideo");
         FileUtils.createFile(mergeVideo);
@@ -105,13 +114,12 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
         mQueue.execCommand(videoCommand.toArray(), new VideoCmdCallback() {
             @Override
             public void onCommandFinish(boolean success) {
-                if (videoInfo.getDuration()>=mediaRecoder.getMaxDuration())
+                if (videoInfo>=mediaRecoder.getMaxDuration())
                 {
-                    for (String fname : videoList) {
-                        FileUtils.deleteFile(fname);
+                    for (String fName : videoList) {
+                        LogUtil.e("fname" + fName);
+                        FileUtils.deleteFile(fName);
                     }
-                    RecordPersenter.this.audioInfo = null;
-                    RecordPersenter.this.videoInfo = null;
                 }
             }
         });
