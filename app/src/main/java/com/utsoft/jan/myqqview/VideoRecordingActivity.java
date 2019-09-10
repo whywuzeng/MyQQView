@@ -17,7 +17,9 @@ import com.utsoft.jan.common.utils.LogUtil;
 import com.utsoft.jan.myqqview.douyin.common.camera.CameraCompat;
 import com.utsoft.jan.myqqview.douyin.common.view.ProgressView;
 import com.utsoft.jan.myqqview.douyin.common.view.RecordButton;
+import com.utsoft.jan.myqqview.douyin.common.view.progressbutton.LoadingImage;
 import com.utsoft.jan.myqqview.douyin.common.view.progressbutton.MasterLayout;
+import com.utsoft.jan.myqqview.douyin.common.view.progressbutton.ProgressLayout2;
 import com.utsoft.jan.myqqview.douyin.common.view.record.OnSurfaceCreatedCallback;
 import com.utsoft.jan.myqqview.douyin.common.view.record.RecordSurfaceView;
 import com.utsoft.jan.myqqview.douyin.recoder.persenter.RecordContract;
@@ -43,6 +45,7 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
     private ProgressView mProgressView;
     public  MasterLayout masterLayout;
     private DownLoadSigTask downLoadSigTask;
+    private ProgressLayout2 layProgress;
 
 
     @Override
@@ -55,6 +58,7 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
         glSurfaceView.setSurfaceCreatedCallback(this);
         recordButton = findViewById(R.id.btn_record);
         mProgressView = findViewById(R.id.pv_progress);
+        layProgress = findViewById(R.id.lay_progress);
 
         recordButton.setOnRecordListener(this);
         initPresenter();
@@ -64,6 +68,27 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
             @Override
             public void onClick(View v) {
                 initMaslayout();
+            }
+        });
+
+        layProgress.setAddStartLoading(new ProgressLayout2.AddStartLoading() {
+            DownLoadSigTask downLoadSigTask = null;
+
+            @Override
+            public void onStartLoading(LoadingImage loadingImage) {
+                //downLoadSigTask = new DownLoadSigTask();
+                //downLoadSigTask.setmLoadingImage(loadingImage);
+                //if (downLoadSigTask != null) {
+                //    downLoadSigTask.execute();
+                //}
+
+                mPresenter.startRecording(mEGLContext, cameraCompat.getOutputSize().width, cameraCompat.getOutputSize().height);
+            }
+
+            @Override
+            public void onEndLoading() {
+                //downLoadSigTask.cancel(true);
+                mPresenter.stopRecording();
             }
         });
 
@@ -130,7 +155,14 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
      class DownLoadSigTask extends AsyncTask<String, Integer, String> {
 
 
-        @Override
+         public void setmLoadingImage(LoadingImage mLoadingImage) {
+             this.mLoadingImage = mLoadingImage;
+         }
+
+         private  LoadingImage mLoadingImage;
+
+
+         @Override
         protected void onPreExecute() {
 
         }
@@ -164,6 +196,11 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
             //publishing progress to progress arc
 
             masterLayout.getCusview().setupprogress(progress[0]);
+            if (mLoadingImage!=null)
+            {
+                mLoadingImage.setProgress(progress[0]);
+            }
+
         }
 
 
@@ -235,6 +272,7 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
 
                 mProgressView.setLoadingProgress( progress);
                 LogUtil.e("progress:"+progress);
+                layProgress.getLoadingImage().setProgress(progress);
             }
         });
     }
@@ -245,6 +283,7 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
             @Override
             public void run() {
                 mProgressView.addProgress( progress);
+                layProgress.getLoadingImage().setLoadingProgress(progress);
             }
         });
     }
