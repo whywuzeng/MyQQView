@@ -287,6 +287,18 @@ public class ProgressLayout2 extends FrameLayout implements View.OnClickListener
                 fullAnimatorSet.start();
                 Mode = ProgressLayoutConstant.LOAD_FINISH;
             }
+
+            @Override
+            public void onLoadingPause() {
+                loadingImage.setVisibility(GONE);
+                squareImg.setVisibility(GONE);
+                firstPlayImg.setVisibility(VISIBLE);
+                playImg.setVisibility(VISIBLE);
+                Mode = ProgressLayoutConstant.First_status;
+                if (addStartLoading != null) {
+                    addStartLoading.onEndLoading();
+                }
+            }
         });
 
 

@@ -37,6 +37,7 @@ public class LoadingImage extends View {
     private addLoadingFinish mAddLoadingFinish;
     private float mLoadingProgress;
 
+
     public LoadingImage(Context context) {
         super(context);
         init();
@@ -104,7 +105,7 @@ public class LoadingImage extends View {
     public void onPause() {
         mStatus = PAUSE_STATUS;
         if (this.mAddLoadingFinish != null) {
-            this.mAddLoadingFinish.onLoadingFinish();
+            this.mAddLoadingFinish.onLoadingPause();
         }
     }
 
@@ -144,6 +145,8 @@ public class LoadingImage extends View {
 
     public interface addLoadingFinish {
         void onLoadingFinish();
+
+        void onLoadingPause();
     }
 
     public void setmAddLoadingFinish(addLoadingFinish mAddLoadingFinish) {
