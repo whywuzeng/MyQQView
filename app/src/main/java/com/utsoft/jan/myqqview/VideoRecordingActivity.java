@@ -92,6 +92,13 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
             }
         });
 
+        layProgress.setOnProgressFinish(new ProgressLayout2.onProgressFinishListener() {
+            @Override
+            public void onProgressFinish() {
+                //点击录制完成之后
+
+            }
+        });
 
         activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         final ConfigurationInfo info = activityManager.getDeviceConfigurationInfo();

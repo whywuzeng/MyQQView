@@ -63,6 +63,12 @@ public class ProgressLayout2 extends FrameLayout implements View.OnClickListener
 
     private AddStartLoading addStartLoading;
 
+    public void setOnProgressFinish(onProgressFinishListener onProgressFinish) {
+        this.onProgressFinish = onProgressFinish;
+    }
+
+    private onProgressFinishListener onProgressFinish;
+
 
     public ProgressLayout2(Context context) {
         super(context);
@@ -332,11 +338,13 @@ public class ProgressLayout2 extends FrameLayout implements View.OnClickListener
         }
     }
 
+    //相当于status还原
     private void clickFinish() {
         fullImg.setVisibility(GONE);
         hookImg.setVisibility(GONE);
         playImg.setVisibility(View.VISIBLE);
         firstPlayImg.setVisibility(View.VISIBLE);
+        squareImg.setVisibility(VISIBLE);
         Mode = ProgressLayoutConstant.First_status;
     }
 
@@ -376,5 +384,9 @@ public class ProgressLayout2 extends FrameLayout implements View.OnClickListener
         void onStartLoading(LoadingImage loadingImage);
 
         void onEndLoading();
+    }
+
+    public interface onProgressFinishListener {
+        void onProgressFinish();
     }
 }
