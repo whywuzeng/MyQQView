@@ -61,7 +61,7 @@ public class ImageFilter {
 
     protected RendererInfo mRendererInfo = new RendererInfo();
 
-    private ThreadLocal<TextrueProgram> mProgram = new ThreadLocal<>();
+    protected ThreadLocal<TextrueProgram> mProgram = new ThreadLocal<>();
 
     protected int aPositionLocation;
 
@@ -83,7 +83,7 @@ public class ImageFilter {
         }
     }
 
-    private void onInit() {
+    protected void onInit() {
         initVertexArgument();
         initFragmentArgument();
     }
