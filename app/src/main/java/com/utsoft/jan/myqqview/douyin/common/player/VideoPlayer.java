@@ -9,6 +9,7 @@ import com.utsoft.jan.common.utils.LogUtil;
 import com.utsoft.jan.myqqview.douyin.common.C;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
 /**
  * Created by Administrator on 2019/9/11.
@@ -17,7 +18,7 @@ import java.io.IOException;
  * <p>
  * com.utsoft.jan.myqqview.douyin.common.player
  */
-public class VideoPlayer {
+public class VideoPlayer implements PlayerImpl{
 
     private MediaExtractor mediaExtractor;
 
@@ -27,6 +28,11 @@ public class VideoPlayer {
     private long duration;
     private MediaCodec decoder;
     private MediaCodec.BufferInfo bufferInfo;
+    private boolean stopped;
+    //当前视频播放的时间
+    private int timeLine;
+    //上一帧图像的时间
+    private long lastSampleTime;
 
     public VideoPlayer(String filePath) {
         this.filePath = filePath;
@@ -44,8 +50,10 @@ public class VideoPlayer {
         }
         bufferInfo = new MediaCodec.BufferInfo();
         final MediaFormat format = mediaExtractor.getTrackFormat(videoTrack);
-        decoder.configure(format,surface,null,);
-
+        decoder.configure(format,surface,null,0);
+        mediaExtractor.selectTrack(videoTrack);
+        decoder.start();
+        stopped = false;
     }
 
     private void initTrack() {
@@ -64,5 +72,55 @@ public class VideoPlayer {
         {
             LogUtil.e("initTrack Error videoTrack"+videoTrack);
         }
+    }
+
+    @Override
+    public void start() {
+        stopped = false;
+        batch();
+    }
+
+    private void batch() {
+        if (stopped)
+        {
+            timeLine = 0;
+            return;
+        }
+        final long sampleTime = mediaExtractor.getSampleTime();
+        consumeFrame(sampleTime,true);
+    }
+
+    private void consumeFrame(long sampleTime, boolean shouldUpdateProgress) {
+        long t = System.nanoTime() / 1000L;
+        long duration = t - timeLine;
+
+        if(timeLine!=0){
+            if (lastSampleTime + duration < sampleTime) {
+                return;
+            }
+        }
+
+        final ByteBuffer[] inputBuffers = decoder.getInputBuffers();
+        final int dequeueInputBufferIndex = decoder.dequeueInputBuffer(C.BUFFER_TIME_OUT);
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void stop() {
+
+    }
+
+    @Override
+    public void seekTo() {
+
+    }
+
+    @Override
+    public void resume() {
+
     }
 }
