@@ -93,6 +93,11 @@ public class AudioRecoder implements Recoder<AudioConfig>, Runnable {
             return;
         }
 
+        if (!isStarted)
+        {
+            return;
+        }
+
         isStarted = false;
         //结束录制线程 和 audioRecord
         recordHandler.post(new Runnable() {

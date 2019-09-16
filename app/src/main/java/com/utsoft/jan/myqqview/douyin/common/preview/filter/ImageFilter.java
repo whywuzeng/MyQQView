@@ -32,11 +32,11 @@ import static android.opengl.GLES20.glVertexAttribPointer;
  */
 public class ImageFilter {
 
-    public static String getFragmentCode() {
+    protected  String getFragmentCode() {
         return FRAGMENT_CODE;
     }
 
-    public static String getVertexCode() {
+    protected  String getVertexCode() {
         return VERTEX_CODE;
     }
 
@@ -88,17 +88,17 @@ public class ImageFilter {
         initFragmentArgument();
     }
 
-    private int getProgram(){
+    protected int getProgram(){
         return mProgram.get().getmProgramId();
     }
 
-    private void initVertexArgument() {
+    protected void initVertexArgument() {
         aPositionLocation = glGetAttribLocation(getProgram(),"aPosition");
         aTextureCoordLocation = glGetAttribLocation(getProgram(),"aTextureCoord");
         uTexMatrixLocation = glGetUniformLocation(getProgram(),"uTexMatrix");
     }
 
-    private void initFragmentArgument() {
+    protected void initFragmentArgument() {
         uTextureLocation = glGetUniformLocation(getProgram(),"uTexture");
     }
 

@@ -21,6 +21,8 @@ public class RecordContract {
         void OnRecordProgress(float progress);
 
         void addProgress(float progress);
+
+        void onViewStopRecord(String filePath);
     }
 
     public interface Presenter extends BaseContract.Presenter {

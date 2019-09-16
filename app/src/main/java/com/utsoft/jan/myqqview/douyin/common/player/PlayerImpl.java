@@ -11,6 +11,6 @@ public interface PlayerImpl {
     void start();
     void pause();
     void stop();
-    void seekTo();
+    void seekTo(long timeUs);
     void resume();
 }

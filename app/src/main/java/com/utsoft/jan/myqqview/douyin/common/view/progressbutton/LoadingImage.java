@@ -9,6 +9,8 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.View;
 
+import com.utsoft.jan.common.utils.LogUtil;
+
 /**
  * Created by Administrator on 2019/9/10.
  * <p>
@@ -36,6 +38,7 @@ public class LoadingImage extends View {
 
     private addLoadingFinish mAddLoadingFinish;
     private float mLoadingProgress;
+    private float tolal;
 
 
     public LoadingImage(Context context) {
@@ -91,10 +94,15 @@ public class LoadingImage extends View {
         sweepAngle += mLoadingProgress;
     }
 
+
     public void setProgress(float progress) {
-        sweepAngle += progress * 3.6f;
+        tolal += progress;
+        LogUtil.e("loadingImage progress"+progress);
+        LogUtil.e("loadingImage tolal"+tolal);
+        sweepAngle = progress * 360f;
         mStatus = PLAYING_STATUS;
         invalidate();
+        LogUtil.e("sweepAngle:"+sweepAngle);
         if (sweepAngle >= 360) {
             if (this.mAddLoadingFinish != null) {
                 this.mAddLoadingFinish.onLoadingFinish();

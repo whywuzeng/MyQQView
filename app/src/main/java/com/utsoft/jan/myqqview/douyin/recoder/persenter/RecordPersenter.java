@@ -57,7 +57,7 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
     private void init(RecordContract.View mView) {
         PermissionManager.instance().checkPermission(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.RECORD_AUDIO}, new RecordPermissionGrantedListener());
-        mediaRecoder = new MediaRecoder(15, this);
+        mediaRecoder = new MediaRecoder(5, this);
         mediaRecoder.setProgressListener(this);
         mQueue = new VideoQueue();
     }
@@ -92,6 +92,7 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
             @Override
             public void onCommandFinish(boolean success) {
                 LogUtil.e("第一次录制有没有成功!");
+                LogUtil.e("横杠百分比:" + videoInfo.getDuration() * 1.0f / mediaRecoder.getMaxDuration());
                 mView.addProgress(videoInfo.getDuration() * 1.0f / mediaRecoder.getMaxDuration());
                 videoList.add(currentFile);
                 LogUtil.e("videoList"+videoList.toString());
@@ -107,19 +108,24 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
     }
 
     private void mergeVideoList(final long videoInfo) {
-
-        String mergeVideo = generateFileName("mergeVideo");
+        LogUtil.e("videoInfo " + videoInfo);
+        final String mergeVideo = generateFileName("mergeVideo");
+        LogUtil.e("mergeVideo :" + mergeVideo);
         FileUtils.createFile(mergeVideo);
         final VideoCommand videoCommand = VideoCommand.mergeVideo(videoList, mergeVideo);
         mQueue.execCommand(videoCommand.toArray(), new VideoCmdCallback() {
             @Override
             public void onCommandFinish(boolean success) {
-                if (videoInfo>=mediaRecoder.getMaxDuration())
+                LogUtil.e("mediaRecoder.getMaxDuration() :" + mediaRecoder.getMaxDuration());
+                long maxDur = (long) mediaRecoder.getMaxDuration();
+                LogUtil.e("mediaRecoder.maxDur :" + maxDur);
+                if (videoInfo >= maxDur)
                 {
                     for (String fName : videoList) {
                         LogUtil.e("fname" + fName);
                         FileUtils.deleteFile(fName);
                     }
+                    mView.onViewStopRecord(mergeVideo);
                 }
             }
         });
@@ -169,6 +175,7 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
             return;
 
         mediaRecoder.stop();
+
     }
 
     //屏幕一黑强制停止

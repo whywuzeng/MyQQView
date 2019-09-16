@@ -8,6 +8,7 @@ import android.opengl.EGLContext;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,6 +23,7 @@ import com.utsoft.jan.myqqview.douyin.common.view.progressbutton.MasterLayout;
 import com.utsoft.jan.myqqview.douyin.common.view.progressbutton.ProgressLayout2;
 import com.utsoft.jan.myqqview.douyin.common.view.record.OnSurfaceCreatedCallback;
 import com.utsoft.jan.myqqview.douyin.common.view.record.RecordSurfaceView;
+import com.utsoft.jan.myqqview.douyin.effect.activity.AfterEffectActivity;
 import com.utsoft.jan.myqqview.douyin.recoder.persenter.RecordContract;
 import com.utsoft.jan.myqqview.douyin.recoder.persenter.RecordPersenter;
 
@@ -46,6 +48,7 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
     public  MasterLayout masterLayout;
     private DownLoadSigTask downLoadSigTask;
     private ProgressLayout2 layProgress;
+    private String filePath;
 
 
     @Override
@@ -95,8 +98,12 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
         layProgress.setOnProgressFinish(new ProgressLayout2.onProgressFinishListener() {
             @Override
             public void onProgressFinish() {
+                if (TextUtils.isEmpty(filePath))
+                {
+                    return;
+                }
                 //点击录制完成之后
-
+                AfterEffectActivity.start(VideoRecordingActivity.this,filePath);
             }
         });
 
@@ -127,9 +134,9 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
                 }
             });
 
-            downLoadSigTask = new DownLoadSigTask();
-
-            downLoadSigTask.execute();
+            //downLoadSigTask = new DownLoadSigTask();
+            //
+            //downLoadSigTask.execute();
         }
         if (MasterLayout.flg_frmwrk_mode == 2) {
 
@@ -293,5 +300,12 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
                 layProgress.getLoadingImage().setLoadingProgress(progress);
             }
         });
+    }
+
+    @Override
+    public void onViewStopRecord(String filePath) {
+        //线程限制么？
+        this.filePath = filePath;
+
     }
 }

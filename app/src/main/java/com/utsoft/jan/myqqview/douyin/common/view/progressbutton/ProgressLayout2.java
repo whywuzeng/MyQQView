@@ -340,12 +340,13 @@ public class ProgressLayout2 extends FrameLayout implements View.OnClickListener
 
     //相当于status还原
     private void clickFinish() {
-        fullImg.setVisibility(GONE);
-        hookImg.setVisibility(GONE);
-        playImg.setVisibility(View.VISIBLE);
-        firstPlayImg.setVisibility(View.VISIBLE);
-        squareImg.setVisibility(VISIBLE);
-        Mode = ProgressLayoutConstant.First_status;
+        //fullImg.setVisibility(GONE);
+        //hookImg.setVisibility(GONE);
+        //playImg.setVisibility(View.VISIBLE);
+        //firstPlayImg.setVisibility(View.VISIBLE);
+        //squareImg.setVisibility(VISIBLE);
+        //Mode = ProgressLayoutConstant.First_status;
+        onProgressFinish.onProgressFinish();
     }
 
     private void clickLoading() {
