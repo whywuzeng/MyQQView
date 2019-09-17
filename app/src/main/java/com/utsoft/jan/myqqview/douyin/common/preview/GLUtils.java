@@ -1,6 +1,7 @@
 package com.utsoft.jan.myqqview.douyin.common.preview;
 
 import android.opengl.GLES11Ext;
+import android.opengl.GLES20;
 
 import com.utsoft.jan.common.utils.LogUtil;
 
@@ -59,6 +60,24 @@ public class GLUtils {
                 GL_CLAMP_TO_EDGE);
 
         return textId;
+    }
+
+    public static int createTexture() {
+        int[] textureIds = new int[1];
+        //创建纹理
+        GLES20.glGenTextures(1, textureIds, 0);
+        if (textureIds[0] == 0) {
+            return 0;
+        }
+        //绑定纹理
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textureIds[0]);
+        //环绕（超出纹理坐标范围）  （s==x t==y GL_REPEAT 重复）
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
+        //过滤（纹理像素映射到坐标点）  （缩小、放大：GL_LINEAR线性）
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        return textureIds[0];
     }
 
     public static int buildProgram(String vertexCode, String fragmentCode) {

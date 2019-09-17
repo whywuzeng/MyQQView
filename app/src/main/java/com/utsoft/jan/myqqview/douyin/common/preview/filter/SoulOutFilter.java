@@ -1,6 +1,5 @@
 package com.utsoft.jan.myqqview.douyin.common.preview.filter;
 
-import android.opengl.GLES10;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
@@ -8,25 +7,18 @@ import android.opengl.Matrix;
 import com.utsoft.jan.common.utils.LogUtil;
 import com.utsoft.jan.myqqview.douyin.common.preview.GLUtils;
 
-import static android.opengl.GLES10.GL_UNSIGNED_BYTE;
-import static android.opengl.GLES20.GL_BLEND;
 import static android.opengl.GLES20.GL_COLOR_ATTACHMENT0;
-import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
-import static android.opengl.GLES20.GL_DST_ALPHA;
 import static android.opengl.GLES20.GL_FLOAT;
 import static android.opengl.GLES20.GL_FRAMEBUFFER;
 import static android.opengl.GLES20.GL_FRAMEBUFFER_COMPLETE;
 import static android.opengl.GLES20.GL_RGBA;
-import static android.opengl.GLES20.GL_SRC_ALPHA;
 import static android.opengl.GLES20.GL_TEXTURE_2D;
 import static android.opengl.GLES20.GL_TRIANGLE_STRIP;
 import static android.opengl.GLES20.glBindFramebuffer;
 import static android.opengl.GLES20.glBindTexture;
-import static android.opengl.GLES20.glBlendFunc;
 import static android.opengl.GLES20.glCheckFramebufferStatus;
 import static android.opengl.GLES20.glDisable;
 import static android.opengl.GLES20.glDrawArrays;
-import static android.opengl.GLES20.glEnable;
 import static android.opengl.GLES20.glFramebufferTexture2D;
 import static android.opengl.GLES20.glGenFramebuffers;
 import static android.opengl.GLES20.glGetUniformLocation;
@@ -52,7 +44,7 @@ public class SoulOutFilter extends ImageFilter {
                     "varying vec2 vTextureCoord;\n" +
                     "uniform mat4 uMvpMatrix;\n" +
                     "void main() {\n" +
-                    "    gl_Position = uMvpMatrix * vec4(aPosition,0.0,1.0);\n" +
+                    "    gl_Position = uMvpMatrix * vec4(aPosition,0.1,1.0);\n" +
                     "   vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
                     "}\n";
     //片元数据
@@ -68,7 +60,7 @@ public class SoulOutFilter extends ImageFilter {
     private int uMvpMatrixLocation;
     private int uAlphaLocation;
     private int sMaxFrame = 15;
-    private int skipFrame = 100;
+    private int skipFrame = 20;
     private float mProgress = 0;
     private int mFrame = 0;
     private float[] mMvpMatrix = new float[16];
@@ -116,13 +108,13 @@ public class SoulOutFilter extends ImageFilter {
         glBindFramebuffer(GL_FRAMEBUFFER, fboId);
 
         //3.创建FBO纹理
-        fboTextureId = GLUtils.createTextureObject(GL_TEXTURE_2D);
+        fboTextureId = GLUtils.createTexture();
 
         //4。把纹理绑定到FBO
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTextureId, 0);
 
         //5.给FBO分配内存大小
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1028, 1920, 0, GL_RGBA, GL_UNSIGNED_BYTE, null);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1028, 1920, 0, GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
 
         //6.检查是否绑定成功
         if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
@@ -130,17 +122,25 @@ public class SoulOutFilter extends ImageFilter {
         }
 
         //7. 解绑纹理和FBO
-        GLES10.glBindTexture(GL_TEXTURE_2D, 0);
+        GLES20.glBindTexture(GL_TEXTURE_2D, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     @Override
     protected void onDraw(int textureId, float[] texMatrix) {
-        GLES20.glClear(GL_COLOR_BUFFER_BIT);
-        //开启混合模式
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_DST_ALPHA);
+        GLES20.glClearColor(0,0,0,0);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
+        // 关闭剔除去掉背面
+        GLES20.glDisable(GLES20.GL_CULL_FACE);
+        // 关闭深度测试
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
+
+        //开启混合模式
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_DST_ALPHA);
+
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         //绑定渲染纹理
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, fboTextureId);
 
@@ -161,7 +161,8 @@ public class SoulOutFilter extends ImageFilter {
         float backAlpha = 1f;
         float alpha = 0f;
         if (mProgress > 0f) {
-            alpha = 0.2f / (1 - mProgress);
+            alpha = 0.4f * (1 - mProgress);
+            LogUtil.e("--alpha:"+alpha);
             backAlpha = 1 - alpha;
         }
         glUniform1f(uAlphaLocation, backAlpha);
@@ -177,15 +178,15 @@ public class SoulOutFilter extends ImageFilter {
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         if (mProgress > 0f) {
-            glUniform1f(uMvpMatrixLocation, alpha);
+            glUniform1f(uAlphaLocation, alpha);
             float scale = 1f + 1f * mProgress*0.6f;
             Matrix.scaleM(mMvpMatrix,0,scale,scale,scale);
             glUniformMatrix4fv(uMvpMatrixLocation,1,false,mMvpMatrix,0);
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
 
-        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0);
-        GLES20.glUseProgram(0);
+        //GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0);
+        //GLES20.glUseProgram(0);
 
 /////////////////////////////////////////////正常渲染///////////////////////////////////////////
 
@@ -194,13 +195,13 @@ public class SoulOutFilter extends ImageFilter {
 
 //todo 这句注释的含义
 //        //这下面的是 正常的渲染
-//        glActiveTexture(GL_TEXTURE0);
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         //绑定好 申请textureId 绑定好纹理类型.已经绑定一次了。
 
         //绑定fbo
         glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fboId);
 
-        glBindTexture(GL_TEXTURE_2D, textureId);
+        glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
 
         mRendererInfo.getRectVertex().position(0);
         glVertexAttribPointer(aPositionLocation, 2, GL_FLOAT, false, 0, mRendererInfo.getRectVertex());
@@ -216,7 +217,7 @@ public class SoulOutFilter extends ImageFilter {
         //解绑fbo
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
-        glDisable(GL_BLEND);
+        glDisable(GLES20.GL_BLEND);
     }
 
 
