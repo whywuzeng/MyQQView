@@ -5,7 +5,6 @@ import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -17,7 +16,7 @@ import java.io.IOException;
  */
 public interface VideoImpl {
 
-    MediaExtractor initMediaExtractor(File path) throws IOException;
+    MediaExtractor initMediaExtractor(String path) throws IOException;
 
     MediaFormat initMediaFormat(String path,MediaExtractor extractor);
 
@@ -26,6 +25,6 @@ public interface VideoImpl {
     int initTrack(MediaExtractor extractor);
 
     //编译出图片
-    Bitmap getBitmapBySec(MediaExtractor extractor,MediaFormat format,MediaCodec codec,long sec);
+    Bitmap getBitmapBySec(MediaExtractor extractor, MediaFormat format, MediaCodec codec, int[] sec);
 
 }

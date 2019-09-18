@@ -1,7 +1,6 @@
 package com.utsoft.jan.myqqview.douyin.common.player;
 
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
@@ -9,11 +8,17 @@ import android.media.Image;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
+import android.os.Environment;
+import android.os.Handler;
 
+import com.utsoft.jan.common.utils.FileUtils;
+import com.utsoft.jan.common.utils.LogUtil;
+import com.utsoft.jan.common.utils.ThreadUtil;
 import com.utsoft.jan.myqqview.douyin.common.C;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -27,12 +32,13 @@ import java.nio.ByteBuffer;
 public class VideoBitmap implements VideoImpl{
 
     private long duration;
+    private Handler mHandler;
 
     @Override
-    public MediaExtractor initMediaExtractor(File path) throws IOException {
+    public MediaExtractor initMediaExtractor(String path) throws IOException {
         MediaExtractor extractor =null;
         extractor = new MediaExtractor();
-        extractor.setDataSource(path.toString());
+        extractor.setDataSource(path);
         return extractor;
     }
 
@@ -77,11 +83,11 @@ public class VideoBitmap implements VideoImpl{
     }
 
     @Override
-    public Bitmap getBitmapBySec(MediaExtractor extractor, MediaFormat format, MediaCodec codec, long sec) {
+    public Bitmap getBitmapBySec(MediaExtractor extractor, MediaFormat format, MediaCodec codec, int[] sec) {
         final MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
 
         //视频定位到上一帧
-        extractor.seekTo(sec,MediaExtractor.SEEK_TO_PREVIOUS_SYNC);
+        extractor.seekTo(sec[0], MediaExtractor.SEEK_TO_PREVIOUS_SYNC);
 
         long presentationTimeUs = 0L;
         boolean sawOutputEOS = false;
@@ -118,21 +124,50 @@ public class VideoBitmap implements VideoImpl{
             outputBufferId = codec.dequeueOutputBuffer(bufferInfo, C.BUFFER_TIME_OUT);
             if (outputBufferId>0)
             {
-                //能够有效输出
-                if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0 | presentationTimeUs >= sec) {
-                    //时间是指定时间或者已经是视频结束时间，停止循环
+                boolean enablePresentation = false;
+                LogUtil.e("presentationTimeUs:" + presentationTimeUs);
+                if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                     sawOutputEOS = true;
+                }
+                for (int i = 0; i < sec.length; i++) {
+                    if (sec[i] != 0 && Math.abs(presentationTimeUs - sec[i]) < 567411) {
+                        enablePresentation = true;
+                        sec[i] = 0;
+                        break;
+                    }
+                }
+                //能够有效输出
+                if (enablePresentation) {
+                    //时间是指定时间或者已经是视频结束时间，停止循环
                     boolean doRender = (bufferInfo.size != 0);
                     if (doRender) {
                         //获取指定时间解码出来的Image对象。
                         image = codec.getOutputImage(outputBufferId);
                         //将Image转换成Bimap
                         YuvImage yuvImage = new YuvImage(YUV_420_888toNV21(image), ImageFormat.NV21, width, height, null);
-                        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                        yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, stream);
-                        bitmap = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
+                        //ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+                        final String pathFile = Environment.getExternalStorageDirectory().getPath() + File.separator + System.currentTimeMillis() + "temp.png";
+
+                        FileUtils.createFile(pathFile);
+
+                        FileOutputStream outputStream = null;
                         try {
-                            stream.close();
+                            outputStream = new FileOutputStream(pathFile);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        final boolean isSuccessful = yuvImage.compressToJpeg(new Rect(0, 0, width, height), 100, outputStream);
+
+                        //bitmap = BitmapFactory.decodeByteArray(stream.toByteArray(), 0, stream.size());
+
+                        if (isSuccessful) {
+                            LogUtil.e("保存成功了");
+                        }
+
+                        try {
+                            //stream.close();
+                            outputStream.close();
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -206,4 +241,48 @@ public class VideoBitmap implements VideoImpl{
         return data;
     }
 
+
+    MediaExtractor extractor = null;
+    MediaFormat mediaFormat = null;
+    MediaCodec decoder = null;
+
+    private String mPath;
+
+    public VideoBitmap(String mPath) {
+        this.mPath = mPath;
+        mHandler = ThreadUtil.newHandlerThread("videobitmap");
+    }
+
+    public void initVideoBitmap() {
+
+        try {
+            if (extractor == null) {
+                extractor = initMediaExtractor(this.mPath);
+            }
+            if (mediaFormat == null) {
+                mediaFormat = initMediaFormat(this.mPath, extractor);
+            }
+            if (decoder == null) {
+                decoder = initMediaCodec(mediaFormat);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        //初始化解码配置
+        decoder.configure(mediaFormat, null, null, 0);
+        decoder.start();
+        int second = (int) (duration / 1000000L);
+        final int[] seconds = new int[second];
+        for (int i = 0; i < second; i++) {
+            seconds[i] = (i++) * 1000000;
+        }
+
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                //开始解码
+                getBitmapBySec(extractor, mediaFormat, decoder, seconds);
+            }
+        });
+    }
 }

@@ -4,6 +4,7 @@ import android.graphics.SurfaceTexture;
 import android.view.Surface;
 
 import com.utsoft.jan.common.factory.presenter.BasePresenter;
+import com.utsoft.jan.myqqview.douyin.common.player.VideoBitmap;
 import com.utsoft.jan.myqqview.douyin.common.player.VideoPlayer;
 
 /**
@@ -16,10 +17,17 @@ import com.utsoft.jan.myqqview.douyin.common.player.VideoPlayer;
 public class AfterEffectPresenter extends BasePresenter<AfterEffectContract.View> implements AfterEffectContract.Persenter {
 
     private VideoPlayer mVideoPlayer;
+    private VideoBitmap videoBitmap;
 
     public AfterEffectPresenter(AfterEffectContract.View mView,String filePath) {
         super(mView);
         mVideoPlayer = new VideoPlayer(filePath);
+        videoBitmap = new VideoBitmap(filePath);
+        initBitmapVideo();
+    }
+
+    private void initBitmapVideo() {
+        videoBitmap.initVideoBitmap();
     }
 
     @Override
