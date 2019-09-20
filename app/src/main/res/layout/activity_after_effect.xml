@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.utsoft.jan.myqqview.douyin.common.view.record.RecordSurfaceView
@@ -14,5 +15,94 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         />
+
+    <ImageButton
+        android:id="@+id/btn_play"
+        android:src="@mipmap/ic_play"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="#00000000"
+        android:layout_marginBottom="275dp"
+        android:layout_marginTop="50dp"
+        android:alpha="0.0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <ImageButton
+        android:id="@+id/btn_back"
+        android:src="@mipmap/ic_white_back"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="#00000000"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"/>
+
+
+    <LinearLayout
+        android:id="@+id/lay_effect_panel"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="120dp"
+        android:orientation="horizontal"
+        android:layout_width="0dp"
+        android:layout_height="30dp">
+
+        <TextView
+            android:id="@+id/tv_current_second"
+            android:text="00:00"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"/>
+
+        <SeekBar
+            android:id="@+id/seek_bar"
+            android:layout_gravity="center"
+            android:layout_weight="4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:maxHeight="5dp"
+            android:progressDrawable="@drawable/shape_play_progress"
+            android:thumb="@drawable/shape_play_progress_thumb"
+            />
+
+        <TextView
+            android:id="@+id/tv_max_second"
+            android:gravity="center"
+            android:text="00:15"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/btn_effect"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@mipmap/ic_effect"
+        android:layout_marginLeft="20dp"
+        android:layout_marginBottom="10dp"
+        android:background="#00000000"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tv_effect"
+        />
+
+    <TextView
+        android:id="@+id/tv_effect"
+        android:text="@string/lable_effect"
+        app:layout_constraintLeft_toLeftOf="@+id/btn_effect"
+        app:layout_constraintRight_toRightOf="@+id/btn_effect"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 
 </android.support.constraint.ConstraintLayout>

@@ -25,6 +25,6 @@ public interface VideoImpl {
     int initTrack(MediaExtractor extractor);
 
     //编译出图片
-    Bitmap getBitmapBySec(MediaExtractor extractor, MediaFormat format, MediaCodec codec, int[] sec);
+    Bitmap getBitmapBySec(MediaExtractor extractor, MediaFormat format, MediaCodec codec, long[] sec);
 
 }

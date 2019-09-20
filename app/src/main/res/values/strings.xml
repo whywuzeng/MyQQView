@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MyQQView</string>
+    <string name="lable_effect">特效</string>
 </resources>

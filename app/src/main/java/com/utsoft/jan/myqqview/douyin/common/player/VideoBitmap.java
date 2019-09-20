@@ -21,6 +21,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Administrator on 2019/9/17.
@@ -33,6 +35,8 @@ public class VideoBitmap implements VideoImpl{
 
     private long duration;
     private Handler mHandler;
+    private List<String> bitmaps = new ArrayList<>();
+
 
     @Override
     public MediaExtractor initMediaExtractor(String path) throws IOException {
@@ -83,7 +87,7 @@ public class VideoBitmap implements VideoImpl{
     }
 
     @Override
-    public Bitmap getBitmapBySec(MediaExtractor extractor, MediaFormat format, MediaCodec codec, int[] sec) {
+    public Bitmap getBitmapBySec(MediaExtractor extractor, MediaFormat format, MediaCodec codec, long[] sec) {
         final MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
 
         //视频定位到上一帧
@@ -128,6 +132,11 @@ public class VideoBitmap implements VideoImpl{
                 LogUtil.e("presentationTimeUs:" + presentationTimeUs);
                 if ((bufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                     sawOutputEOS = true;
+                    //这里回调
+                    if (mBitmapsCallback!=null)
+                    {
+                        mBitmapsCallback.getBitmaps(bitmaps);
+                    }
                 }
                 for (int i = 0; i < sec.length; i++) {
                     if (sec[i] != 0 && Math.abs(presentationTimeUs - sec[i]) < 567411) {
@@ -164,6 +173,7 @@ public class VideoBitmap implements VideoImpl{
                         if (isSuccessful) {
                             LogUtil.e("保存成功了");
                         }
+                        bitmaps.add(pathFile);
 
                         try {
                             //stream.close();
@@ -272,9 +282,10 @@ public class VideoBitmap implements VideoImpl{
         decoder.configure(mediaFormat, null, null, 0);
         decoder.start();
         int second = (int) (duration / 1000000L);
-        final int[] seconds = new int[second];
+        final long[] seconds = new long[second+1];
+        seconds[0]=0;
         for (int i = 0; i < second; i++) {
-            seconds[i] = (i++) * 1000000;
+            seconds[i+1] = (i+1)*888888L;
         }
 
         mHandler.post(new Runnable() {
@@ -284,5 +295,15 @@ public class VideoBitmap implements VideoImpl{
                 getBitmapBySec(extractor, mediaFormat, decoder, seconds);
             }
         });
+    }
+
+    private OnBitmapsCallback mBitmapsCallback;
+
+    public void setBitmapsCallback(OnBitmapsCallback mBitmapsCallback) {
+        this.mBitmapsCallback = mBitmapsCallback;
+    }
+
+    public interface OnBitmapsCallback{
+        void getBitmaps(List<String> bitmaps);
     }
 }

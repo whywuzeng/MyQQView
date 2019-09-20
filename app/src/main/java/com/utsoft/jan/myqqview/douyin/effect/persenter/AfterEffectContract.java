@@ -15,9 +15,16 @@ public class AfterEffectContract {
 
     public interface Persenter extends BaseContract.Presenter {
         void initSurface(SurfaceTexture surfaceView);
+
+        void pause();
+
+        void resume();
     }
 
     public interface View extends BaseContract.View<Persenter> {
 
+        void onPlayerProgress(float rate, long maxSampleTime);
+
+        void getMaxSampleTime(long maxSampleTime);
     }
 }
