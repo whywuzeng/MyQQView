@@ -160,6 +160,8 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
      */
     @Override
     public void startRecording(EGLContext mEGLContext, int width, int height) {
+        //todo 这里不应该在主线程开始 有问题
+        //todo 怀疑是play线程有问题
         if (!mediaRecoder.start(mEGLContext, width, height, mMode)) {
             Toast.makeText(AppProfile.getContext(), "视频已达到最大长度", Toast.LENGTH_SHORT).show();
             return;

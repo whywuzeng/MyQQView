@@ -15,7 +15,6 @@ import static android.opengl.GLES20.GL_RGBA;
 import static android.opengl.GLES20.GL_TEXTURE_2D;
 import static android.opengl.GLES20.GL_TRIANGLE_STRIP;
 import static android.opengl.GLES20.glBindFramebuffer;
-import static android.opengl.GLES20.glBindTexture;
 import static android.opengl.GLES20.glCheckFramebufferStatus;
 import static android.opengl.GLES20.glDisable;
 import static android.opengl.GLES20.glDrawArrays;
@@ -93,7 +92,7 @@ public class SoulOutFilter extends ImageFilter {
     @Override
     protected void onInit() {
         super.onInit();
-        createFBO();
+        //createFBO();
 
     }
 
@@ -142,7 +141,7 @@ public class SoulOutFilter extends ImageFilter {
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
         //绑定渲染纹理
-        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, fboTextureId);
+        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, textureId);
 
         mProgress = (float) mFrame / sMaxFrame;
         if (mProgress > 1f) {
@@ -162,7 +161,7 @@ public class SoulOutFilter extends ImageFilter {
         float alpha = 0f;
         if (mProgress > 0f) {
             alpha = 0.4f * (1 - mProgress);
-            LogUtil.e("--alpha:"+alpha);
+            //LogUtil.e("--alpha:"+alpha);
             backAlpha = 1 - alpha;
         }
         glUniform1f(uAlphaLocation, backAlpha);
@@ -185,37 +184,37 @@ public class SoulOutFilter extends ImageFilter {
             glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         }
 
-        //GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0);
-        //GLES20.glUseProgram(0);
+        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0);
+        GLES20.glUseProgram(0);
 
 /////////////////////////////////////////////正常渲染///////////////////////////////////////////
-
-        //使用程序
-        mProgram.get().useProgram();
-
-//todo 这句注释的含义
-//        //这下面的是 正常的渲染
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        //绑定好 申请textureId 绑定好纹理类型.已经绑定一次了。
-
-        //绑定fbo
-        glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fboId);
-
-        glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
-
-        mRendererInfo.getRectVertex().position(0);
-        glVertexAttribPointer(aPositionLocation, 2, GL_FLOAT, false, 0, mRendererInfo.getRectVertex());
-        checkGlError("glVertexAttribPointer");
-        mRendererInfo.getTexVertext().position(0);
-        glVertexAttribPointer(aTextureCoordLocation, 2, GL_FLOAT, false, 0, mRendererInfo.getTexVertext());
-        checkGlError("glVertexAttribPointer");
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        //解绑纹理
-        GLES20.glBindTexture(GL_TEXTURE_2D, 0);
-        //解绑fbo
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+//
+//        //使用程序
+//        mProgram.get().useProgram();
+//
+////todo 这句注释的含义
+////        //这下面的是 正常的渲染
+//        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+//        //绑定好 申请textureId 绑定好纹理类型.已经绑定一次了。
+//
+//        //绑定fbo
+//        glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fboId);
+//
+//        glBindTexture(GLES20.GL_TEXTURE_2D, textureId);
+//
+//        mRendererInfo.getRectVertex().position(0);
+//        glVertexAttribPointer(aPositionLocation, 2, GL_FLOAT, false, 0, mRendererInfo.getRectVertex());
+//        checkGlError("glVertexAttribPointer");
+//        mRendererInfo.getTexVertext().position(0);
+//        glVertexAttribPointer(aTextureCoordLocation, 2, GL_FLOAT, false, 0, mRendererInfo.getTexVertext());
+//        checkGlError("glVertexAttribPointer");
+//
+//        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+//
+//        //解绑纹理
+//        GLES20.glBindTexture(GL_TEXTURE_2D, 0);
+//        //解绑fbo
+//        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
         glDisable(GLES20.GL_BLEND);
     }

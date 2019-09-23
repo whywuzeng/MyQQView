@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.Drawable;
 import android.opengl.EGLContext;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 
 import com.utsoft.jan.common.app.PresenterActivity;
 import com.utsoft.jan.common.utils.ScreenUtil;
+import com.utsoft.jan.common.widget.popup.PopPasterView;
 import com.utsoft.jan.myqqview.R;
 import com.utsoft.jan.myqqview.douyin.common.C;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.SoulOutFilter;
@@ -23,6 +25,10 @@ import com.utsoft.jan.myqqview.douyin.common.view.record.OnSurfaceCreatedCallbac
 import com.utsoft.jan.myqqview.douyin.common.view.record.RecordSurfaceView;
 import com.utsoft.jan.myqqview.douyin.effect.persenter.AfterEffectContract;
 import com.utsoft.jan.myqqview.douyin.effect.persenter.AfterEffectPresenter;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by Administrator on 2019/9/11.
@@ -34,6 +40,10 @@ import com.utsoft.jan.myqqview.douyin.effect.persenter.AfterEffectPresenter;
 public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.Persenter> implements AfterEffectContract.View, OnSurfaceCreatedCallback, View.OnClickListener {
 
     private static final String key_path_final = "key:path";
+    @BindView(R.id.tv_add_sticker)
+    TextView tvAddSticker;
+    @BindView(R.id.tv_add_subtitle)
+    TextView tvAddSubtitle;
 
     private RecordSurfaceView surfaceView;
     private String filePath;
@@ -44,6 +54,7 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
     private TextView tvCurrentSecond;
     private SeekBar mSeekBar;
     private TextView tvMaxSecond;
+    private PopPasterView popPasterView;
 
     public static void start(Activity from, String fileName) {
         final Intent intent = new Intent(from, AfterEffectActivity.class);
@@ -55,6 +66,7 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_after_effect);
+        ButterKnife.bind(this);
         final Intent intent = getIntent();
         filePath = intent.getExtras().getString(key_path_final);
 
@@ -80,7 +92,7 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
 
     @Override
     protected void initPresenter() {
-        mPresenter = new AfterEffectPresenter(this,filePath);
+        mPresenter = new AfterEffectPresenter(this, filePath);
     }
 
     @Override
@@ -186,6 +198,18 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
         setTvMaxSecond((int) maxSampleTime);
     }
 
+    @Override
+    public void setSeekBarDrawable(final Drawable drawable) {
+        if (drawable != null) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mSeekBar.setProgressDrawable(drawable);
+                }
+            });
+        }
+    }
+
     public void setTvCurrentSecond(int second) {
         if (second < 10) {
             tvCurrentSecond.setText("00:0" + second);
@@ -202,5 +226,18 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
         else {
             tvMaxSecond.setText("00:" + second);
         }
+    }
+
+    @OnClick(R.id.tv_add_sticker)
+    public void onTvAddStickerClicked() {
+        if (popPasterView == null) {
+            popPasterView = new PopPasterView(AfterEffectActivity.this);
+        }
+        popPasterView.show();
+    }
+
+    @OnClick(R.id.tv_add_subtitle)
+    public void onTvAddSubtitleClicked() {
+
     }
 }

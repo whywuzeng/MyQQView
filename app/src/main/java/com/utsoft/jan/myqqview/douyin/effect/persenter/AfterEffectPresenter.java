@@ -1,6 +1,7 @@
 package com.utsoft.jan.myqqview.douyin.effect.persenter;
 
 import android.graphics.SurfaceTexture;
+import android.graphics.drawable.Drawable;
 import android.view.Surface;
 
 import com.utsoft.jan.common.factory.presenter.BasePresenter;
@@ -36,7 +37,8 @@ public class AfterEffectPresenter extends BasePresenter<AfterEffectContract.View
         videoBitmap.setBitmapsCallback(new VideoBitmap.OnBitmapsCallback() {
             @Override
             public void getBitmaps(List<String> bitmaps) {
-                MutilBitmapUtils.Bitmaps2Drawable(bitmaps);
+                final Drawable bitmaps2Drawable = MutilBitmapUtils.Bitmaps2Drawable(bitmaps);
+                mView.setSeekBarDrawable(bitmaps2Drawable);
             }
         });
     }

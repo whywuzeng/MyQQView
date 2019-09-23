@@ -3,6 +3,7 @@ package com.utsoft.jan.common.utils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.os.SystemClock;
@@ -65,8 +66,9 @@ public class MutilBitmapUtils {
             e.printStackTrace();
         }
 
+        final Drawable bitmapDrawable = new BitmapDrawable(bitmap);
 
-        return null;
+        return bitmapDrawable;
     }
 
 
@@ -100,5 +102,7 @@ public class MutilBitmapUtils {
         }
         return result;
     }
+
+
 
 }
