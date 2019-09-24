@@ -28,6 +28,10 @@ public class StickView extends android.support.v7.widget.AppCompatImageView {
     private RectF deleteRectF;
     private RectF scaleRectF;
 
+    public StickOption getOption() {
+        return mOption;
+    }
+
     private StickOption mOption;
     private Bitmap mBitmap;
     private float[] valueFloat;
@@ -87,7 +91,6 @@ public class StickView extends android.support.v7.widget.AppCompatImageView {
     }
 
 
-
     public void setBitmap(Bitmap bitmap) {
         mOption.getMatrix().reset();
         mBitmap = bitmap;
@@ -108,7 +111,7 @@ public class StickView extends android.support.v7.widget.AppCompatImageView {
         final Matrix matrix = mOption.getMatrix();
         matrix.getValues(valueFloat);
 
-        if (mBitmap != null)
+        if (mBitmap == null)
             return;
 
         canvas.save();
@@ -134,9 +137,9 @@ public class StickView extends android.support.v7.widget.AppCompatImageView {
 
         if (mOption.isEdit()) {
             canvas.drawLine(x1, y1, x2, y2, mPaint);
-            canvas.drawLine(x2, y2, x3, y3, mPaint);
-            canvas.drawLine(x3, y3, x4, y4, mPaint);
-            canvas.drawLine(x4, y4, x1, y1, mPaint);
+            canvas.drawLine(x2, y2, x4, y4, mPaint);
+            canvas.drawLine(x4, y4, x3, y3, mPaint);
+            canvas.drawLine(x3, y3, x1, y1, mPaint);
         }
 
         canvas.drawBitmap(bitmapDelete, null, deleteRectF, null);

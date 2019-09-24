@@ -4,12 +4,14 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.opengl.EGLContext;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -18,6 +20,7 @@ import android.widget.TextView;
 
 import com.utsoft.jan.common.app.PresenterActivity;
 import com.utsoft.jan.common.utils.ScreenUtil;
+import com.utsoft.jan.common.widget.Imageview.StickView;
 import com.utsoft.jan.common.widget.popup.PopPasterView;
 import com.utsoft.jan.myqqview.R;
 import com.utsoft.jan.myqqview.douyin.common.C;
@@ -253,6 +256,13 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
             public void onItemClick(int resId) {
                 //P 处理
                 mPresenter.addStick(resId);
+
+                final StickView stickView = new StickView(AfterEffectActivity.this);
+                stickView.setBitmap(BitmapFactory.decodeResource(getResources(), resId));
+                stickView.getOption().setEdit(true);
+
+                final FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                rlContentRoot.addView(stickView, lp);
             }
         });
         popPasterView.show();

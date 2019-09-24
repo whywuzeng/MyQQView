@@ -6,6 +6,7 @@ import android.view.Surface;
 
 import com.utsoft.jan.common.factory.presenter.BasePresenter;
 import com.utsoft.jan.common.utils.MutilBitmapUtils;
+import com.utsoft.jan.common.widget.Imageview.StickView;
 import com.utsoft.jan.myqqview.douyin.common.C;
 import com.utsoft.jan.myqqview.douyin.common.player.VideoBitmap;
 import com.utsoft.jan.myqqview.douyin.common.player.VideoPlayer;
@@ -70,7 +71,6 @@ public class AfterEffectPresenter extends BasePresenter<AfterEffectContract.View
 
     @Override
     public void addStick(int resId) {
-
     }
 
     @Override
