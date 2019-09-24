@@ -10,6 +10,7 @@ import android.opengl.EGLContext;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -55,6 +56,8 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
     private SeekBar mSeekBar;
     private TextView tvMaxSecond;
     private PopPasterView popPasterView;
+    private FrameLayout layStickFra;
+    private FrameLayout rlContentRoot;
 
     public static void start(Activity from, String fileName) {
         final Intent intent = new Intent(from, AfterEffectActivity.class);
@@ -79,6 +82,8 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
         tvCurrentSecond = (TextView) findViewById(R.id.tv_current_second);
         mSeekBar = (SeekBar) findViewById(R.id.seek_bar);
         tvMaxSecond = (TextView) findViewById(R.id.tv_max_second);
+        layStickFra = (FrameLayout) findViewById(R.id.lay_stick);
+        rlContentRoot = (FrameLayout) findViewById(R.id.rl_content_root);
 
         btnEffect.setOnClickListener(this);
         btnPlay.setOnClickListener(this);
@@ -163,11 +168,11 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
     }
 
     private void surfaceViewAnim() {
-        final ObjectAnimator scaleX = ObjectAnimator.ofFloat(surfaceView, "scaleX", 1.0f, 0.56f);
-        final ObjectAnimator scaleY = ObjectAnimator.ofFloat(surfaceView, "scaleY", 1.0f, 0.56f);
+        final ObjectAnimator scaleX = ObjectAnimator.ofFloat(layStickFra, "scaleX", 1.0f, 0.56f);
+        final ObjectAnimator scaleY = ObjectAnimator.ofFloat(layStickFra, "scaleY", 1.0f, 0.56f);
 
-        surfaceView.setPivotX(ScreenUtil.getScreenWidth() / 2);
-        surfaceView.setPivotY(0);
+        layStickFra.setPivotX(ScreenUtil.getScreenWidth() / 2);
+        layStickFra.setPivotY(0);
         final AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(scaleX, scaleY);
         animatorSet.setDuration(500);
@@ -175,10 +180,10 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
     }
 
     private void surfaceViewAnimBig() {
-        final ObjectAnimator scaleX = ObjectAnimator.ofFloat(surfaceView, "scaleX", 1.0f, 1.44f);
-        final ObjectAnimator scaleY = ObjectAnimator.ofFloat(surfaceView, "scaleY", 1.0f, 1.44f);
-        surfaceView.setPivotX(ScreenUtil.getScreenWidth() / 2);
-        surfaceView.setPivotY(0);
+        final ObjectAnimator scaleX = ObjectAnimator.ofFloat(layStickFra, "scaleX", 1.0f, 1.44f);
+        final ObjectAnimator scaleY = ObjectAnimator.ofFloat(layStickFra, "scaleY", 1.0f, 1.44f);
+        layStickFra.setPivotX(ScreenUtil.getScreenWidth() / 2);
+        layStickFra.setPivotY(0);
         final AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(scaleX, scaleY);
         animatorSet.setDuration(500);
@@ -186,16 +191,26 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
     }
 
     @Override
-    public void onPlayerProgress(float rate, long sampleTime) {
-        mSeekBar.setProgress((int) rate);
-        final long second = sampleTime / C.SECOND_IN_US;
-        setTvCurrentSecond((int) second);
+    public void onPlayerProgress(final float rate, final long sampleTime) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mSeekBar.setProgress((int) rate);
+                final long second = sampleTime / C.SECOND_IN_US;
+                setTvCurrentSecond((int) second);
+            }
+        });
     }
 
     @Override
-    public void getMaxSampleTime(long maxSampleTime) {
-        mSeekBar.setMax(100);
-        setTvMaxSecond((int) maxSampleTime);
+    public void getMaxSampleTime(final long maxSampleTime) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mSeekBar.setMax(100);
+                setTvMaxSecond((int) maxSampleTime);
+            }
+        });
     }
 
     @Override
@@ -233,6 +248,13 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
         if (popPasterView == null) {
             popPasterView = new PopPasterView(AfterEffectActivity.this);
         }
+        popPasterView.setSelectListener(new PopPasterView.onSelectListener() {
+            @Override
+            public void onItemClick(int resId) {
+                //P 处理
+                mPresenter.addStick(resId);
+            }
+        });
         popPasterView.show();
     }
 

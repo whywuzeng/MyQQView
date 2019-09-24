@@ -162,7 +162,7 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
     public void startRecording(EGLContext mEGLContext, int width, int height) {
         //todo 这里不应该在主线程开始 有问题
         //todo 怀疑是play线程有问题
-        if (!mediaRecoder.start(mEGLContext, width, height, mMode)) {
+        if (!mediaRecoder.startHandle(mEGLContext, width, height, mMode)) {
             Toast.makeText(AppProfile.getContext(), "视频已达到最大长度", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -176,14 +176,14 @@ public class RecordPersenter extends BasePresenter<RecordContract.View>
         if (!mStarted)
             return;
 
-        mediaRecoder.stop();
+        mediaRecoder.stopHandle();
 
     }
 
     //屏幕一黑强制停止
     @Override
     public void stopRecord(){
-        mediaRecoder.stop();
+        mediaRecoder.stopHandle();
     }
 
     private String generateFileName() {

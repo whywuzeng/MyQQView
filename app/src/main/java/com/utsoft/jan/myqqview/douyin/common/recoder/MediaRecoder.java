@@ -1,9 +1,11 @@
 package com.utsoft.jan.myqqview.douyin.common.recoder;
 
 import android.opengl.EGLContext;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import com.utsoft.jan.common.utils.FileUtils;
+import com.utsoft.jan.common.utils.ThreadUtil;
 import com.utsoft.jan.myqqview.douyin.common.C;
 import com.utsoft.jan.myqqview.douyin.common.recoder.audio.AudioConfig;
 import com.utsoft.jan.myqqview.douyin.common.recoder.video.VideoConfig;
@@ -29,6 +31,8 @@ public class MediaRecoder implements onFrameAvailableListener, OnRecordFinishLis
     private VideoRecoder videoRecoder;
     private AudioRecoder audioRecoder;
 
+    private Handler mHandler;
+
     public MediaRecoder(int seconds, @NonNull OnRecordFinishListener listener)
     {
         mFinishListener = listener;
@@ -39,6 +43,17 @@ public class MediaRecoder implements onFrameAvailableListener, OnRecordFinishLis
         remainDuration = seconds * C.SECOND_IN_US;
         maxDuration = remainDuration;
         videoRecoder.setOnRecordFinishListener(this);
+        mHandler = ThreadUtil.newHandlerThread("MediaRecoder");
+    }
+
+    public boolean startHandle(final EGLContext context, final int width, final int height, @C.SpeedMode final int mode) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                start(context, width, height, mode);
+            }
+        });
+        return true;
     }
 
     public boolean start(EGLContext context, int width, int height, @C.SpeedMode int mode){
@@ -81,6 +96,15 @@ public class MediaRecoder implements onFrameAvailableListener, OnRecordFinishLis
 
     public void setProgressListener(OnRecordProgressListener listener){
         videoRecoder.setProgressListener(listener);
+    }
+
+    public void stopHandle() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                stop();
+            }
+        });
     }
 
     public void stop() {

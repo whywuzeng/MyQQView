@@ -20,6 +20,8 @@ public class AfterEffectContract {
         void pause();
 
         void resume();
+
+        void addStick(int resId);
     }
 
     public interface View extends BaseContract.View<Persenter> {

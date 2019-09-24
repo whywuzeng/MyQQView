@@ -129,7 +129,7 @@ public class VideoPlayer implements PlayerImpl{
     private void consumeFrame(long sampleTime, boolean shouldUpdateProgress) {
         long t = System.nanoTime() / 1000L;
         long duration = t - timeLine;
-
+        //这个逻辑是什么意思
         if(timeLine!=0){
             if (lastSampleTime + duration < sampleTime) {
                 return;

@@ -69,6 +69,11 @@ public class AfterEffectPresenter extends BasePresenter<AfterEffectContract.View
     }
 
     @Override
+    public void addStick(int resId) {
+
+    }
+
+    @Override
     public void start() {
         super.start();
         mVideoPlayer.start();

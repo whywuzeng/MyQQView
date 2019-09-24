@@ -84,6 +84,20 @@ public class PopPasterView {
         }
         myadapter.replace(integerList);
         recyclerView.setAdapter(myadapter);
+        myadapter.setAdapterListener(new RecyclerAdapter.AdapterListener<Integer>() {
+            @Override
+            public void onItemClick(RecyclerAdapter.ViewHolder holder, Integer integer) {
+                if (mListener!=null)
+                {
+                    mListener.onItemClick(integer);
+                }
+            }
+
+            @Override
+            public void onItemLongClick(RecyclerAdapter.ViewHolder holder, Integer integer) {
+
+            }
+        });
         recyclerView.setLayoutManager(new GridLayoutManager(mContext, 4));
     }
 
@@ -124,5 +138,15 @@ public class PopPasterView {
         protected void onBind(Integer mData) {
             pasterview.setImageResource(mData);
         }
+    }
+
+    private onSelectListener mListener;
+
+    public void setSelectListener(onSelectListener mListener) {
+        this.mListener = mListener;
+    }
+
+    public interface onSelectListener{
+        void onItemClick(int resId);
     }
 }
