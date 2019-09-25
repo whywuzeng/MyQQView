@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.utsoft.jan.common.app.PresenterActivity;
 import com.utsoft.jan.common.utils.ScreenUtil;
+import com.utsoft.jan.common.widget.Imageview.StickOption;
 import com.utsoft.jan.common.widget.Imageview.StickView;
 import com.utsoft.jan.common.widget.popup.PopPasterView;
 import com.utsoft.jan.myqqview.R;
@@ -257,9 +258,11 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
                 //P 处理
                 mPresenter.addStick(resId);
 
-                final StickView stickView = new StickView(AfterEffectActivity.this);
+                final StickOption stickOption = new StickOption().setEdit(true).setWidth(rlContentRoot.getWidth())
+                        .setHeight(rlContentRoot.getHeight());
+                final StickView stickView = new StickView(AfterEffectActivity.this,stickOption);
+
                 stickView.setBitmap(BitmapFactory.decodeResource(getResources(), resId));
-                stickView.getOption().setEdit(true);
 
                 final FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                 rlContentRoot.addView(stickView, lp);
