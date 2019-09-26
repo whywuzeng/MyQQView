@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">MyQQView</string>
     <string name="lable_effect">特效</string>
+    <string name="lable_edit">编辑影片</string>
+    <string name="label_next_tip">下一步</string>
 </resources>

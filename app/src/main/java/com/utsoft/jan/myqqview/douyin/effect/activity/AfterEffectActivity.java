@@ -22,6 +22,7 @@ import com.utsoft.jan.common.app.PresenterActivity;
 import com.utsoft.jan.common.utils.ScreenUtil;
 import com.utsoft.jan.common.widget.Imageview.StickOption;
 import com.utsoft.jan.common.widget.Imageview.StickView;
+import com.utsoft.jan.common.widget.Imageview.onDeleteView;
 import com.utsoft.jan.common.widget.popup.PopPasterView;
 import com.utsoft.jan.myqqview.R;
 import com.utsoft.jan.myqqview.douyin.common.C;
@@ -49,6 +50,8 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
     TextView tvAddSticker;
     @BindView(R.id.tv_add_subtitle)
     TextView tvAddSubtitle;
+    @BindView(R.id.tv_nextTip)
+    TextView tvNextTip;
 
     private RecordSurfaceView surfaceView;
     private String filePath;
@@ -88,6 +91,7 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
         tvMaxSecond = (TextView) findViewById(R.id.tv_max_second);
         layStickFra = (FrameLayout) findViewById(R.id.lay_stick);
         rlContentRoot = (FrameLayout) findViewById(R.id.rl_content_root);
+
 
         btnEffect.setOnClickListener(this);
         btnPlay.setOnClickListener(this);
@@ -260,11 +264,18 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
 
                 final StickOption stickOption = new StickOption().setEdit(true).setWidth(rlContentRoot.getWidth())
                         .setHeight(rlContentRoot.getHeight());
-                final StickView stickView = new StickView(AfterEffectActivity.this,stickOption);
+                final StickView stickView = new StickView(AfterEffectActivity.this, stickOption);
 
                 stickView.setBitmap(BitmapFactory.decodeResource(getResources(), resId));
 
                 final FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+
+                stickView.setOnDeleteView(new onDeleteView<StickView>() {
+                    @Override
+                    public void deleteClick(StickView view) {
+                        rlContentRoot.removeView(view);
+                    }
+                });
                 rlContentRoot.addView(stickView, lp);
             }
         });
@@ -273,6 +284,15 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
 
     @OnClick(R.id.tv_add_subtitle)
     public void onTvAddSubtitleClicked() {
+
+    }
+
+    //下一步
+    @OnClick(R.id.tv_nextTip)
+    public void onViewClicked() {
+        //逻辑处理
+        // 暂停
+        //setedite(false)
 
     }
 }

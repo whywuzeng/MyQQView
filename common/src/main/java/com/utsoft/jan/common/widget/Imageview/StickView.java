@@ -22,7 +22,7 @@ import com.utsoft.jan.common.utils.ScreenUtil;
  * <p>
  * com.utsoft.jan.common.widget.Imageview
  */
-public class StickView extends android.support.v7.widget.AppCompatImageView {
+public class StickView extends android.support.v7.widget.AppCompatImageView implements StickViewImpl {
 
     /**
      * 边界画笔
@@ -46,6 +46,12 @@ public class StickView extends android.support.v7.widget.AppCompatImageView {
     private float MIN_SCALE;
     private float MAX_SCALE;
     private float bitmapInitWidth;
+
+    private onDeleteView<StickView> mOnDeleteView;
+
+    public void setOnDeleteView(onDeleteView<StickView> mOnDeleteView) {
+        this.mOnDeleteView = mOnDeleteView;
+    }
 
     public StickView(Context context, StickOption mOption) {
         super(context);
@@ -182,10 +188,9 @@ public class StickView extends android.support.v7.widget.AppCompatImageView {
             canvas.drawLine(x2, y2, x4, y4, mPaint);
             canvas.drawLine(x4, y4, x3, y3, mPaint);
             canvas.drawLine(x3, y3, x1, y1, mPaint);
+            canvas.drawBitmap(bitmapDelete, null, deleteRectF, null);
+            canvas.drawBitmap(bitmapRotate, null, scaleRectF, null);
         }
-
-        canvas.drawBitmap(bitmapDelete, null, deleteRectF, null);
-        canvas.drawBitmap(bitmapRotate, null, scaleRectF, null);
 
         canvas.restore();
     }
@@ -195,6 +200,7 @@ public class StickView extends android.support.v7.widget.AppCompatImageView {
 
     boolean isResize = false;
     boolean inSide = false;
+    boolean inDelete = false;
     private float lastDegress = 0;
     private PointF mid = new PointF();
 
@@ -211,17 +217,30 @@ public class StickView extends android.support.v7.widget.AppCompatImageView {
                 if (isInBitmap(event)) {
                     inSide = true;
                     isResize = false;
+                    inDelete = false;
+                    mOption.setEdit(true);
                     mLastX = event.getX();
                     mLastY = event.getY();
                 }
                 else if (isInResize(event)) {
                     isResize = true;
                     inSide = false;
+                    inDelete = false;
                     lastDegress = startRotation(event);
                     midStartPoint(event);
                     lastmidDp = scaleMidPoint(event);
+                }
+                else if (isInDelete(event)) {
+                    inDelete = true;
+                    isResize = false;
+                    inSide = false;
+                    if (mOnDeleteView != null) {
+                        mOnDeleteView.deleteClick(StickView.this);
+                    }
+
                 }else {
-                    handle = false;
+                    handle = true;
+                    mOption.setEdit(false);
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -238,7 +257,7 @@ public class StickView extends android.support.v7.widget.AppCompatImageView {
                 }
                 else if (isResize) {
                     //这里还没有旋转，还是以前的样子  所以旋转的中心应该为 down记录mid
-                    mOption.getMatrix().postRotate(startRotation(event) - lastDegress, mid.x, mid.y);
+                    mOption.getMatrix().postRotate((startRotation(event) - lastDegress)*2, mid.x, mid.y);
                     lastDegress = startRotation(event);
 
                     final float newScalePoint = scaleMidPoint(event);
@@ -266,14 +285,33 @@ public class StickView extends android.support.v7.widget.AppCompatImageView {
 
 
                 break;
+            case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
                 inSide = false;
                 isResize = false;
+                inDelete = false;
+                invalidate();
                 break;
 
         }
         return handle;
         //return super.onTouchEvent(event);
+    }
+
+    private boolean isInDelete(MotionEvent event) {
+        final float x = event.getX();
+        final float y = event.getY();
+
+        final float v1 = deleteRectF.left - bitmapDeleteWidth / 2;
+        final float v2 = deleteRectF.right + bitmapDeleteWidth / 2;
+
+        final float v3 = deleteRectF.top - bitmapDeleteHeight / 2;
+        final float v4 = deleteRectF.bottom + bitmapDeleteHeight / 2;
+
+        if (v1 < x && x < v2 && v3 < y && y < v4)
+            return true;
+
+        return false;
     }
 
     //得到 event 到 mid 距离
@@ -390,4 +428,18 @@ public class StickView extends android.support.v7.widget.AppCompatImageView {
 
         return Math.abs(rectS - (s1 + s2 + s3 + s4)) < 0.5;
     }
+
+    @Override
+    public void setEditable() {
+        mOption.setEdit(true);
+        invalidate();
+    }
+
+    @Override
+    public void setNoEditable() {
+        mOption.setEdit(false);
+        invalidate();
+    }
+
+
 }

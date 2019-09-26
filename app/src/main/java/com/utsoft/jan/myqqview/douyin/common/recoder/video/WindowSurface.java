@@ -5,6 +5,8 @@ import android.view.Surface;
 
 /**
  * Created by 薛贤俊 on 2018/3/8.
+ *
+ * 都是调用这个类的方法,,直接实现类
  */
 
 public class WindowSurface extends BaseGLSurface {

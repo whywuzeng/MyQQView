@@ -20,6 +20,7 @@ public class OffScreenWrapper {
     public OffScreenWrapper(EGLContext context, Surface surface) {
         mGLCore = new GLCore(context, GLCore.FLAG_RECORDABLE);
         mEncoderSurface = new WindowSurface(mGLCore, surface, true);
+        //配置好，准备
         mEncoderSurface.makeCurrent();
     }
 
@@ -43,6 +44,7 @@ public class OffScreenWrapper {
         filter.init();
         filter.draw(textureId, matrix,0,0);
         mEncoderSurface.setPresentationTime(time);
+        //开始绘制，硬件调用。
         mEncoderSurface.swapBuffers();
     }
 }
