@@ -19,4 +19,12 @@ public class InputSurface {
         windowSurface = new WindowSurface(mGLCore, surface, true);
         windowSurface.makeCurrent();
     }
+
+    public void MCurrent(){
+        windowSurface.makeCurrent();
+    }
+
+    public void swapBuf(){
+        windowSurface.swapBuffers();
+    }
 }
