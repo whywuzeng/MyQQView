@@ -6,10 +6,15 @@ import android.opengl.GLES20;
 import com.utsoft.jan.common.utils.LogUtil;
 
 import static android.opengl.GLES20.GL_CLAMP_TO_EDGE;
+import static android.opengl.GLES20.GL_COLOR_ATTACHMENT0;
 import static android.opengl.GLES20.GL_COMPILE_STATUS;
 import static android.opengl.GLES20.GL_FRAGMENT_SHADER;
+import static android.opengl.GLES20.GL_FRAMEBUFFER;
+import static android.opengl.GLES20.GL_FRAMEBUFFER_COMPLETE;
 import static android.opengl.GLES20.GL_LINEAR;
 import static android.opengl.GLES20.GL_LINK_STATUS;
+import static android.opengl.GLES20.GL_RGBA;
+import static android.opengl.GLES20.GL_TEXTURE_2D;
 import static android.opengl.GLES20.GL_TEXTURE_MAG_FILTER;
 import static android.opengl.GLES20.GL_TEXTURE_MIN_FILTER;
 import static android.opengl.GLES20.GL_TEXTURE_WRAP_S;
@@ -17,18 +22,22 @@ import static android.opengl.GLES20.GL_TEXTURE_WRAP_T;
 import static android.opengl.GLES20.GL_VALIDATE_STATUS;
 import static android.opengl.GLES20.GL_VERTEX_SHADER;
 import static android.opengl.GLES20.glAttachShader;
+import static android.opengl.GLES20.glBindFramebuffer;
 import static android.opengl.GLES20.glBindTexture;
+import static android.opengl.GLES20.glCheckFramebufferStatus;
 import static android.opengl.GLES20.glCompileShader;
 import static android.opengl.GLES20.glCreateProgram;
 import static android.opengl.GLES20.glCreateShader;
 import static android.opengl.GLES20.glDeleteProgram;
 import static android.opengl.GLES20.glDeleteShader;
+import static android.opengl.GLES20.glFramebufferTexture2D;
 import static android.opengl.GLES20.glGenTextures;
 import static android.opengl.GLES20.glGetProgramInfoLog;
 import static android.opengl.GLES20.glGetProgramiv;
 import static android.opengl.GLES20.glGetShaderiv;
 import static android.opengl.GLES20.glLinkProgram;
 import static android.opengl.GLES20.glShaderSource;
+import static android.opengl.GLES20.glTexImage2D;
 import static android.opengl.GLES20.glTexParameterf;
 import static android.opengl.GLES20.glTexParameteri;
 import static android.opengl.GLES20.glValidateProgram;
@@ -135,5 +144,39 @@ public class GLUtils {
             return 0;
         }
         return shaderObjectId;
+    }
+
+    public static void createFBOFrame(int width,int height){
+         int[] fFrame = new int[1];
+         int[] fTexture = new int[1];
+
+        GLES20.glDeleteFramebuffers(1, fFrame, 0);
+        GLES20.glDeleteTextures(1, fTexture, 0);
+        //1.创建FBO
+        GLES20.glGenFramebuffers(1,fFrame,0);
+        //3.创建FBO纹理
+        fTexture[0] = GLUtils.createTexture();
+
+        //5.给FBO分配内存大小
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 600, 600, 0, GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+
+    }
+
+    public static void bindFrameTexture(int frameBufferId,int textureId){
+        //2.绑定FBO
+        glBindFramebuffer(GL_FRAMEBUFFER, frameBufferId);
+        //4。把纹理绑定到FBO
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureId, 0);
+
+        //6.检查是否绑定成功
+        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+            LogUtil.e("zzz", "glFramebufferTexture2D error");
+        }
+    }
+
+    public static void unBindFrameBuffer(){
+        //7. 解绑纹理和FBO
+        GLES20.glBindTexture(GL_TEXTURE_2D, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 }

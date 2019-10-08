@@ -49,12 +49,23 @@ public class CameraCompatV21 extends CameraCompat {
                         return;
                     }
                     mCaptureSession = session;
-                    startRequest(session);
+                    if (mCameraReady && mCaptureSession!=null)
+                    {
+                        startRequest(session);
+                    }
                 }
 
                 @Override
                 public void onConfigureFailed(@NonNull CameraCaptureSession session) {
                     LogUtil.e(TAG, "onConfigureFailed");
+                }
+
+                @Override
+                public void onClosed(@NonNull CameraCaptureSession session) {
+                    if (mCaptureSession != null&&mCaptureSession.equals(session))
+                    {
+                        mCaptureSession = null;
+                    }
                 }
             };
 

@@ -26,7 +26,6 @@ import com.utsoft.jan.common.widget.Imageview.onDeleteView;
 import com.utsoft.jan.common.widget.popup.PopPasterView;
 import com.utsoft.jan.myqqview.R;
 import com.utsoft.jan.myqqview.douyin.common.C;
-import com.utsoft.jan.myqqview.douyin.common.preview.filter.SoulOutFilter;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.WaterMarkFilter;
 import com.utsoft.jan.myqqview.douyin.common.view.record.OnSurfaceCreatedCallback;
 import com.utsoft.jan.myqqview.douyin.common.view.record.RecordSurfaceView;
@@ -99,14 +98,13 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
         btnBack.setOnClickListener(this);
 
         surfaceView.setSurfaceCreatedCallback(this);
-        surfaceView.setFilter(new SoulOutFilter());
+        //surfaceView.setFilter(new SoulOutFilter());
         initPresenter();
 
         final WaterMarkFilter waterMarkFilter = new WaterMarkFilter();
         waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(getResources(),R.mipmap.bufuhanzhe));
         waterMarkFilter.setPosition(0,70,0,0);
         surfaceView.setFilter(waterMarkFilter);
-
     }
 
     @Override

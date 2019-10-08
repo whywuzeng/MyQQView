@@ -82,20 +82,23 @@ public class VideoCipple implements Recoder<VideoConfig> {
         while (!isDone) {
             if (!isInputDone) {
                 final int inputIndex = decoderByType.dequeueInputBuffer(C.BUFFER_TIME_OUT);
-                 int sampleSize = 0;
+                int sampleSize = 0;
                 if (inputIndex > 0) {
                     final ByteBuffer decoderBuffer = decoderBuffers[inputIndex];
+                    decoderBuffer.clear();
                     sampleSize = mediaExtractor.readSampleData(decoderBuffer, 0);
-                    if (sampleSize <= 0) {
-                        //取出来为空
-                        mediaExtractor.seekTo(0,MediaExtractor.SEEK_TO_CLOSEST_SYNC);
-                        //重新可以dequeue的
-                        decoderByType.flush();
+                    if (sampleSize >= 0) {
+                        //根据时间来判断是否要 装数据.这里如果不根据呢
+                        decoderByType.queueInputBuffer(inputIndex, 0, sampleSize, mediaExtractor.getSampleTime(), 0);
+                        mediaExtractor.advance();
+                    }
+                    else {
+                        decoderByType.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+                        isInputDone = true;
                     }
                 }
 
-                //根据时间来判断是否要 装数据.这里如果不根据呢
-                decoderByType.queueInputBuffer(inputIndex,0,sampleSize,mediaExtractor.getSampleTime(),0);
+            }
 
                 if (!isOutputDone)
                 {
@@ -121,7 +124,6 @@ public class VideoCipple implements Recoder<VideoConfig> {
             }
 
 
-        }
 
     }
 
@@ -158,11 +160,11 @@ public class VideoCipple implements Recoder<VideoConfig> {
 
         final OutputSurface outputSurface = new OutputSurface();
         //取得outputsurface
-        decoderByType.configure(videoDecoderFormat, null, null, 0);
+        decoderByType.configure(videoDecoderFormat, outputSurface.getSurface(), null, 0);
 
         //初始化inputsurface
-
         final InputSurface inputSurface = new InputSurface(encoderByType.createInputSurface());
+        inputSurface.MCurrent();
 
         decoderByType.start();
         encoderByType.start();

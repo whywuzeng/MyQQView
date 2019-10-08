@@ -1,9 +1,6 @@
 package com.utsoft.jan.myqqview.douyin.common.preview.filter;
 
-import android.graphics.Bitmap;
 import android.opengl.GLES20;
-
-import com.utsoft.jan.myqqview.douyin.common.preview.GLUtils;
 
 import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
 import static android.opengl.GLES20.GL_FLOAT;
@@ -15,7 +12,6 @@ import static android.opengl.GLES20.glClear;
 import static android.opengl.GLES20.glDrawArrays;
 import static android.opengl.GLES20.glUniformMatrix4fv;
 import static android.opengl.GLES20.glVertexAttribPointer;
-import static android.opengl.GLUtils.texImage2D;
 
 /**
  * Created by Administrator on 2019/10/7.
@@ -24,7 +20,7 @@ import static android.opengl.GLUtils.texImage2D;
  * <p>
  * com.utsoft.jan.myqqview.douyin.common.preview.filter
  */
-public class WaterMarkFilter extends ImageFilter{
+public class NoFilter extends ImageFilter{
 
     private static final String FRAGMENT_CODE =
             "precision mediump float;\n" +
@@ -47,27 +43,8 @@ public class WaterMarkFilter extends ImageFilter{
                     "    vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
                     "}";
 
-    private int x,y,w = 300,h =300;
-    private int width,height;
-    private Bitmap mBitmap;
     private int mTextureId;
 
-    private NoFilter mNoFilter;
-
-    public void setWaterMark(Bitmap bitmap){
-        if(this.mBitmap!=null && !mBitmap.isRecycled()){
-            this.mBitmap.recycle();
-            mBitmap = null;
-        }
-        this.mBitmap=bitmap;
-    }
-
-    public void setPosition(int x,int y,int width,int height){
-        this.x=x;
-        this.y=y;
-        this.w=width;
-        this.h=height;
-    }
 
     @Override
     protected String getFragmentCode() {
@@ -85,12 +62,6 @@ public class WaterMarkFilter extends ImageFilter{
     }
 
     @Override
-    public void init() {
-        super.init();
-        mNoFilter = new NoFilter();
-    }
-
-    @Override
     protected void initVertexArgument() {
         super.initVertexArgument();
     }
@@ -101,24 +72,7 @@ public class WaterMarkFilter extends ImageFilter{
     }
 
     @Override
-    protected void onDraw(int textureId, float[] texMatrix) {
-
-        //GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        //GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-
-        //GLES20.glViewport(x,y,w == 0 ? mBitmap.getWidth():w,h==0?mBitmap.getHeight():h);
-
-        //mNoFilter.init();
-        //mNoFilter.onDraw(textureId,texMatrix,width,height);
-
-        final int textureIDI = GLUtils.createTexture();
-        GLES20.glViewport(0,0,100,100);
-        GLES20.glEnable(GLES20.GL_BLEND);
-        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-        texImage2D(GLES20.GL_TEXTURE_2D, 0, mBitmap, 0);
-
-        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+    protected void onDraw(int textureId, float[] texMatrix,int width,int height) {
 
         glUniformMatrix4fv(uTexMatrixLocation,1,false,texMatrix,0);
         checkGlError("glUniformMatrix4fv");
@@ -130,10 +84,8 @@ public class WaterMarkFilter extends ImageFilter{
         checkGlError("glVertexAttribPointer");
         glActiveTexture(GL_TEXTURE0);
         //绑定好 申请textureId 绑定好纹理类型.已经绑定一次了。
-        glBindTexture(GLES20.GL_TEXTURE_2D,textureIDI);
+        glBindTexture(GLES20.GL_TEXTURE_2D,textureId);
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawArrays(GL_TRIANGLE_STRIP,0,4);
-
-        GLES20.glDisable(GLES20.GL_BLEND);
     }
 }
