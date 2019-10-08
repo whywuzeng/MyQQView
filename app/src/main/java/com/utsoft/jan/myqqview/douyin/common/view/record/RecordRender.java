@@ -1,15 +1,19 @@
 package com.utsoft.jan.myqqview.douyin.common.view.record;
 
+import android.graphics.BitmapFactory;
 import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
+import com.utsoft.jan.common.app.AppProfile;
+import com.utsoft.jan.myqqview.R;
 import com.utsoft.jan.myqqview.douyin.common.preview.GLUtils;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.GroupFilter;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.ImageFilter;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.NoFilter;
+import com.utsoft.jan.myqqview.douyin.common.preview.filter.WaterMarkFilter;
 import com.utsoft.jan.myqqview.douyin.common.recoder.video.VideoFrameData;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -29,6 +33,7 @@ import static android.opengl.GLES20.glTexImage2D;
 public class RecordRender implements GLSurfaceView.Renderer {
 
     private final NoFilter showFilter;
+    private final WaterMarkFilter waterMarkFilter;
     private RecordSurfaceView mTarget;
     private int mTextureId;
     private SurfaceTexture mSurfaceTexture;
@@ -51,18 +56,21 @@ public class RecordRender implements GLSurfaceView.Renderer {
     public RecordRender(RecordSurfaceView mTarget) {
         this.mTarget = mTarget;
         mBeFilter = new GroupFilter();
-        showFilter=new NoFilter();
+        showFilter = new NoFilter();
+
+        waterMarkFilter = new WaterMarkFilter();
+        waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(AppProfile.getContext().getResources(), R.mipmap.bufuhanzhe));
+        waterMarkFilter.setPosition(0, 70, 0, 0);
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         mTextureId = GLUtils.createTextureObject(GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
         mSurfaceTexture = new SurfaceTexture(mTextureId);
-        mTarget.onSurfaceCreated(mSurfaceTexture,EGL14.eglGetCurrentContext());
+        mTarget.onSurfaceCreated(mSurfaceTexture, EGL14.eglGetCurrentContext());
 
         //加载 ImageFilter 图片过滤
-        if (mOldFilter == null)
-        {
+        if (mOldFilter == null) {
             mOldFilter = new ImageFilter();
         }
         if (imageFilter == null) {
@@ -73,25 +81,25 @@ public class RecordRender implements GLSurfaceView.Renderer {
         }
     }
 
-    public void setPreviewSize(int width,int height){
+    public void setPreviewSize(int width, int height) {
         mPreviewHeight = height;
         mPreviewWidth = width;
     }
 
-   private int[] fFrame = new int[1];
-   private int[] fTexture = new int[1];
+    private int[] fFrame = new int[1];
+    private int[] fTexture = new int[1];
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         mCanvasWidth = width;
         mCanvasHeight = height;
-        GLES20.glViewport(0,0,width,height);
-        mBeFilter.setSize(width,height);
+        GLES20.glViewport(0, 0, width, height);
+        mBeFilter.setSize(width, height);
         //初始化 FBO 为了多画
         GLES20.glDeleteFramebuffers(1, fFrame, 0);
         GLES20.glDeleteTextures(1, fTexture, 0);
         //1.创建FBO
-        GLES20.glGenFramebuffers(1,fFrame,0);
+        GLES20.glGenFramebuffers(1, fFrame, 0);
         //3.创建FBO纹理
         fTexture[0] = GLUtils.createTexture();
 
@@ -99,8 +107,9 @@ public class RecordRender implements GLSurfaceView.Renderer {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
     }
 
-    public void setFilter(ImageFilter filter){
+    public void setFilter(ImageFilter filter) {
         mBeFilter.addFilter(filter);
+        imageFilter = filter;
     }
 
     @Override
@@ -110,8 +119,7 @@ public class RecordRender implements GLSurfaceView.Renderer {
         }
 
         float matrix[] = new float[16];
-        if (mSurfaceTexture!=null)
-        {
+        if (mSurfaceTexture != null) {
             mSurfaceTexture.updateTexImage();
         }
 
@@ -132,22 +140,26 @@ public class RecordRender implements GLSurfaceView.Renderer {
 
 
         mSurfaceTexture.getTransformMatrix(mMatrix);
+        waterMarkFilter.init();
+        //        imageFilter.draw(mTextureId,mMatrix,mCanvasWidth,mCanvasHeight);
 
-
-        if (mOldFilter!=null)
-        {
+        if (mOldFilter != null) {
             mOldFilter.init();
-            GLUtils.bindFrameTexture(fFrame[0],fTexture[0]);
-            mOldFilter.draw(mTextureId,mMatrix,mCanvasWidth,mCanvasHeight);
+            GLUtils.bindFrameTexture(fFrame[0], fTexture[0]);
+            mOldFilter.draw(mTextureId, mMatrix, mCanvasWidth, mCanvasHeight);
             GLUtils.unBindFrameBuffer();
 
-            mBeFilter.init();
-            mBeFilter.draw(mMatrix,fTexture[0]);
-        }
+            GLUtils.bindFrameTexture(fFrame[0], fTexture[0]);
+            waterMarkFilter.draw(mTextureId, mMatrix, mCanvasWidth, mCanvasHeight);
+            GLUtils.unBindFrameBuffer();
 
-        /**绘制显示的filter*/
-        GLES20.glViewport(0,0,mCanvasWidth,mCanvasHeight);
-        showFilter.init();
-        showFilter.draw(mBeFilter.getOutputTexture(),mMatrix,mCanvasWidth,mCanvasHeight);
+            GLES20.glViewport(0,0,mCanvasWidth,mCanvasHeight);
+            imageFilter.draw(mTextureId, mMatrix, mCanvasWidth, mCanvasHeight);
+        }
     }
+
+    //        /**绘制显示的filter*/
+    //        GLES20.glViewport(0,0,mCanvasWidth,mCanvasHeight);
+    //        showFilter.init();
+    //        showFilter.draw(mBeFilter.getOutputTexture(),mMatrix,mCanvasWidth,mCanvasHeight);
 }

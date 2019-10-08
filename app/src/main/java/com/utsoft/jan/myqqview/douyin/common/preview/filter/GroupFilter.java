@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
  */
 public class GroupFilter extends ImageFilter{
 
-    private Queue<ImageFilter> mFilterQueue = new ConcurrentLinkedDeque<>();;
+    private Queue<ImageFilter> mFilterQueue = new ConcurrentLinkedDeque<>();
     private List<ImageFilter> mFilters;
 
     private int width=0, height=0;
@@ -76,7 +76,7 @@ public class GroupFilter extends ImageFilter{
             GLES20.glViewport(0,0,width,height);
             filter.init();
             if(textureIndex==0){
-                filter.onDraw(this.mTextureId,matrix);
+                filter.draw(this.mTextureId,matrix,width,height);
             }else{
                 filter.draw(fTexture[(textureIndex-1)%2],matrix,width,height);
             }

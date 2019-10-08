@@ -15,7 +15,6 @@ import static android.opengl.GLES20.glClear;
 import static android.opengl.GLES20.glDrawArrays;
 import static android.opengl.GLES20.glUniformMatrix4fv;
 import static android.opengl.GLES20.glVertexAttribPointer;
-import static android.opengl.GLUtils.texImage2D;
 
 /**
  * Created by Administrator on 2019/10/7.
@@ -102,23 +101,13 @@ public class WaterMarkFilter extends ImageFilter{
 
     @Override
     protected void onDraw(int textureId, float[] texMatrix) {
-
-        //GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        //GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-
         //GLES20.glViewport(x,y,w == 0 ? mBitmap.getWidth():w,h==0?mBitmap.getHeight():h);
 
-        //mNoFilter.init();
-        //mNoFilter.onDraw(textureId,texMatrix,width,height);
-
-        final int textureIDI = GLUtils.createTexture();
-        GLES20.glViewport(0,0,100,100);
+        final int textureIDI = GLUtils.loadBitmapTexture(mBitmap);
+        GLES20.glViewport(0,50, (int) (mBitmap.getWidth()*1.5f), (int) (mBitmap.getHeight()*1.5f));
+//        GLES20.glViewport(0,0,width,height);
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
-        texImage2D(GLES20.GL_TEXTURE_2D, 0, mBitmap, 0);
-
-        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
 
         glUniformMatrix4fv(uTexMatrixLocation,1,false,texMatrix,0);
         checkGlError("glUniformMatrix4fv");

@@ -32,6 +32,8 @@ import static android.opengl.GLES20.glVertexAttribPointer;
  */
 public class ImageFilter {
 
+    private int mTextrueProgramId;
+
     protected  String getFragmentCode() {
         return FRAGMENT_CODE;
     }
@@ -79,6 +81,7 @@ public class ImageFilter {
         if (mProgram.get() == null)
         {
             mProgram.set(new TextrueProgram(getVertexCode(),getFragmentCode()));
+            mTextrueProgramId = new TextrueProgram(getVertexCode(), getFragmentCode()).getmProgramId();
             onInit();
         }
     }
@@ -89,7 +92,8 @@ public class ImageFilter {
     }
 
     protected int getProgram(){
-        return mProgram.get().getmProgramId();
+//          return mProgram.get().getmProgramId();
+        return mTextrueProgramId;
     }
 
     protected void initVertexArgument() {
@@ -149,7 +153,8 @@ public class ImageFilter {
         {
             return;
         }
-        mProgram.get().useProgram();
+//        mProgram.get().useProgram();
+        GLES20.glUseProgram(mTextrueProgramId);
         checkGlError("useProgram");
         enableArguments();
         onDraw(textureId,texMatrix,width,height);
@@ -173,7 +178,8 @@ public class ImageFilter {
             return;
         }
 
-        glDeleteProgram(mProgram.get().getmProgramId());
+//        glDeleteProgram(mProgram.get().getmProgramId());
+        glDeleteProgram(mTextrueProgramId);
         mProgram.set(null);
     }
 }
