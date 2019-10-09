@@ -1,5 +1,7 @@
 package com.utsoft.jan.myqqview.douyin.common.preview.filter;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 /**
@@ -11,13 +13,6 @@ import java.nio.FloatBuffer;
  */
 public class MultiRenderInfo {
 
-    private BaseRenderImageFilterImpl baseRenderImageFilter;
-
-    public MultiRenderInfo(BaseRenderImageFilterImpl baseRenderImageFilter) {
-        //必须实现接口
-        this.baseRenderImageFilter = baseRenderImageFilter;
-    }
-
     //着色器顶点
     private final static float[] FULL_RECT_VERTEX = {
             -1.0f, -1.0f,// 左下角
@@ -27,7 +22,7 @@ public class MultiRenderInfo {
     };
 
     //前置摄像头的坐标
-    protected float frontTextureData[] = {
+    protected final static float frontTextureData[] = {
             1f, 1f, // 右上角
             1f, 0f, // 右下角
             0f, 1f, // 左上角
@@ -35,7 +30,7 @@ public class MultiRenderInfo {
     };
 
     //后置摄像头坐标
-    protected float backTextureData[] = {
+    protected final static float backTextureData[] = {
             0f, 1f, // 左上角
             0f, 0f, //  左下角
             1f, 1f, // 右上角
@@ -51,7 +46,7 @@ public class MultiRenderInfo {
     };
 
     //显示的纹理坐标点
-    protected float displayTextureData[] = {
+    protected final static float displayTextureData[] = {
             0f, 1f,
             1f, 1f,
             0f, 0f,
@@ -59,7 +54,7 @@ public class MultiRenderInfo {
     };
 
     //帧缓冲空间坐标点
-    protected float frameBufferData[] = {
+    protected final static float frameBufferData[] = {
             0f, 0f,
             1f, 0f,
             0f, 1f,
@@ -72,19 +67,70 @@ public class MultiRenderInfo {
 
     //纹理坐标 Buffer
     private FloatBuffer mFrontTextureBuffer;
-    protected int mFrontTextureBufferId;
+    //此vbo的用法 不熟悉 抛弃
+    //protected int mFrontTextureBufferId;
 
     //纹理坐标 Buffer
     private FloatBuffer mBackTextureBuffer;
-    protected int mBackTextureBufferId;
+    //protected int mBackTextureBufferId;
 
     private FloatBuffer mDisplayTextureBuffer;
-    protected int mDisplayTextureBufferId;
+    //protected int mDisplayTextureBufferId;
 
     private FloatBuffer mFrameTextureBuffer;
-    protected int mFrameTextureBufferId;
+    //protected int mFrameTextureBufferId;
 
-    public void create(){
+
+    public FloatBuffer getVertexBuffer() {
+        return mVertexBuffer;
+    }
+
+    public FloatBuffer getFrontTextureBuffer() {
+        return mFrontTextureBuffer;
+    }
+
+    public FloatBuffer getBackTextureBuffer() {
+        return mBackTextureBuffer;
+    }
+
+    public FloatBuffer getDisplayTextureBuffer() {
+        return mDisplayTextureBuffer;
+    }
+
+    public FloatBuffer getFrameTextureBuffer() {
+        return mFrameTextureBuffer;
+    }
+
+    public MultiRenderInfo(){
+        //装载本地数据  （顶点坐标）
+        mVertexBuffer = ByteBuffer.allocateDirect(FULL_RECT_VERTEX.length * 4).order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
+        mVertexBuffer.position(0);
+        mVertexBuffer.put(FULL_RECT_VERTEX);
+
+        //前
+        mFrontTextureBuffer = ByteBuffer.allocateDirect(frontTextureData.length * 4).order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
+        mFrontTextureBuffer.position(0);
+        mFrontTextureBuffer.put(frontTextureData);
+
+        //后
+        mBackTextureBuffer = ByteBuffer.allocateDirect(backTextureData.length * 4).order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
+        mBackTextureBuffer.position(0);
+        mBackTextureBuffer.put(backTextureData);
+
+        //显示
+        mDisplayTextureBuffer = ByteBuffer.allocateDirect(displayTextureData.length * 4).order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
+        mDisplayTextureBuffer.position(0);
+        mDisplayTextureBuffer.put(displayTextureData);
+
+        ///帧缓冲空间坐标点
+        mFrameTextureBuffer = ByteBuffer.allocateDirect(frameBufferData.length * 4).order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
+        mFrameTextureBuffer.position(0);
+        mFrameTextureBuffer.put(frameBufferData);
 
     }
 

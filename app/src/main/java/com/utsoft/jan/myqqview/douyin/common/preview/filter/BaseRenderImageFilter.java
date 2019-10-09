@@ -17,6 +17,16 @@ public class BaseRenderImageFilter  {
     //程序点
     protected int mProgram;
 
+    private BaseRenderImageFilterImpl mBaseRenderImageFilter;
 
+    public BaseRenderImageFilter(BaseRenderImageFilterImpl baseRenderImageFilter) {
+        mBaseRenderImageFilter = baseRenderImageFilter;
+    }
 
+    private MultiRenderInfo multiRenderInfo;
+
+    public void create(){
+        multiRenderInfo = new MultiRenderInfo();
+        //初始化 mpro
+    }
 }
