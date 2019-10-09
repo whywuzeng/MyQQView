@@ -3,6 +3,7 @@ package com.utsoft.jan.myqqview.douyin.common.recoder.video;
 import android.graphics.SurfaceTexture;
 import android.view.Surface;
 
+import com.utsoft.jan.common.app.AppProfile;
 import com.utsoft.jan.myqqview.douyin.common.view.record.EncodeRender;
 import com.utsoft.jan.myqqview.douyin.common.view.record.RecordRender;
 
@@ -29,7 +30,7 @@ public class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
 
 
     public void setup(int videoWidth, int videoHeight){
-        encodeRender = new EncodeRender();
+        encodeRender = new EncodeRender(AppProfile.getContext());
         encodeRender.onSurfaceCreated(null,null);
         encodeRender.onSurfaceChanged(null,videoWidth,videoHeight);
 

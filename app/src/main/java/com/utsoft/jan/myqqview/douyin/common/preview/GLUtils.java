@@ -3,6 +3,7 @@ package com.utsoft.jan.myqqview.douyin.common.preview;
 import android.graphics.Bitmap;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
+import android.util.Log;
 
 import com.utsoft.jan.common.utils.LogUtil;
 
@@ -203,5 +204,20 @@ public class GLUtils {
         GLES20.glGenerateMipmap(GLES20.GL_TEXTURE_2D);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
         return textureIds[0];
+    }
+
+    public static int createFrameBuffer() {
+        int[] buffers = new int[1];
+        GLES20.glGenFramebuffers(1, buffers, 0);
+        checkError();
+        return buffers[0];
+    }
+
+    private static final String TAG = "GLUtils";
+
+    public static void checkError() {
+        if (GLES20.glGetError() != GLES20.GL_NO_ERROR) {
+            Log.e(TAG, "createOutputTexture: " + GLES20.glGetError() );
+        }
     }
 }

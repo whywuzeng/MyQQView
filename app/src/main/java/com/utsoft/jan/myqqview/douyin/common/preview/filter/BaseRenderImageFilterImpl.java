@@ -12,13 +12,13 @@ public interface BaseRenderImageFilterImpl {
     void onCreate();
 
     //改变image尺寸
-    void onChanged();
+    void onChanged(int width,int height);
 
     //设置纹理
     void setInputTextureId(int textureId);
 
     //得到纹理
-    void getOutputTextureId();
+    int getOutputTextureId();
 
     //顶点着色器
     String getVertexSource();
