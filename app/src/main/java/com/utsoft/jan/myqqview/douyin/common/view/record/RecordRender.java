@@ -154,7 +154,7 @@ public class RecordRender implements GLSurfaceView.Renderer {
             GLUtils.unBindFrameBuffer();
 
             GLES20.glViewport(0,0,mCanvasWidth,mCanvasHeight);
-            imageFilter.draw(mTextureId, mMatrix, mCanvasWidth, mCanvasHeight);
+            imageFilter.draw(fTexture[0], mMatrix, mCanvasWidth, mCanvasHeight);
         }
     }
 

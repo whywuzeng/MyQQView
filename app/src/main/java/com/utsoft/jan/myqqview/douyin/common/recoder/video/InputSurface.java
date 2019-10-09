@@ -27,4 +27,12 @@ public class InputSurface {
     public void swapBuf(){
         windowSurface.swapBuffers();
     }
+
+    public void setPresentationTime(long time){
+        windowSurface.setPresentationTime(time);
+    }
+
+    public void release(){
+        windowSurface.release();
+    }
 }

@@ -9,6 +9,7 @@ import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.opengl.EGLContext;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.utsoft.jan.common.app.PresenterActivity;
+import com.utsoft.jan.common.utils.FileUtils;
 import com.utsoft.jan.common.utils.ScreenUtil;
 import com.utsoft.jan.common.widget.Imageview.StickOption;
 import com.utsoft.jan.common.widget.Imageview.StickView;
@@ -26,10 +28,15 @@ import com.utsoft.jan.common.widget.Imageview.onDeleteView;
 import com.utsoft.jan.common.widget.popup.PopPasterView;
 import com.utsoft.jan.myqqview.R;
 import com.utsoft.jan.myqqview.douyin.common.C;
+import com.utsoft.jan.myqqview.douyin.common.recoder.video.VideoCipple;
+import com.utsoft.jan.myqqview.douyin.common.recoder.video.VideoConfig;
 import com.utsoft.jan.myqqview.douyin.common.view.record.OnSurfaceCreatedCallback;
 import com.utsoft.jan.myqqview.douyin.common.view.record.RecordSurfaceView;
 import com.utsoft.jan.myqqview.douyin.effect.persenter.AfterEffectContract;
 import com.utsoft.jan.myqqview.douyin.effect.persenter.AfterEffectPresenter;
+
+import java.io.File;
+import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -64,6 +71,7 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
     private PopPasterView popPasterView;
     private FrameLayout layStickFra;
     private FrameLayout rlContentRoot;
+    private VideoCipple videoCipple;
 
     public static void start(Activity from, String fileName) {
         final Intent intent = new Intent(from, AfterEffectActivity.class);
@@ -122,6 +130,9 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (videoCipple != null) {
+            videoCipple.stop();
+        }
     }
 
     @Override
@@ -292,6 +303,20 @@ public class AfterEffectActivity extends PresenterActivity<AfterEffectContract.P
         //逻辑处理
         // 暂停
         //setedite(false)
+        final String outputPath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator  + "temp.mp4";
+        FileUtils.createFile(outputPath);
 
+        final VideoConfig video = new VideoConfig(null, 1080, 1920, C.VideoParams.BIT_RATE,C.VIDEO_TEMP_FILE_NAME);
+
+        videoCipple = new VideoCipple();
+        try {
+            videoCipple.configure(video);
+            videoCipple.init(filePath, outputPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        videoCipple.start();
     }
+
+
 }

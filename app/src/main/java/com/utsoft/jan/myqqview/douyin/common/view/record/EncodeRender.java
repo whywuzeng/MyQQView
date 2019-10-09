@@ -1,12 +1,15 @@
 package com.utsoft.jan.myqqview.douyin.common.view.record;
 
+import android.graphics.BitmapFactory;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
+import com.utsoft.jan.common.app.AppProfile;
+import com.utsoft.jan.myqqview.R;
 import com.utsoft.jan.myqqview.douyin.common.preview.GLUtils;
-import com.utsoft.jan.myqqview.douyin.common.preview.filter.ImageFilter;
+import com.utsoft.jan.myqqview.douyin.common.preview.filter.WaterMarkFilter;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -22,8 +25,13 @@ import javax.microedition.khronos.opengles.GL10;
 public class EncodeRender implements GLSurfaceView.Renderer {
 
     private int mTextureId;
+
+    public SurfaceTexture getSurfaceTexture() {
+        return mSurfaceTexture;
+    }
+
     private SurfaceTexture mSurfaceTexture;
-    private ImageFilter imageFilter;
+    private WaterMarkFilter imageFilter;
     private int mCanvasWidth;
     private int mCanvasHeight;
 
@@ -34,7 +42,10 @@ public class EncodeRender implements GLSurfaceView.Renderer {
         mSurfaceTexture = new SurfaceTexture(mTextureId);
         if (imageFilter == null)
         {
-            imageFilter = new ImageFilter();
+            imageFilter = new WaterMarkFilter();
+            imageFilter.setWaterMark(BitmapFactory.decodeResource(AppProfile.getContext().getResources(), R.mipmap.bufuhanzhe));
+            imageFilter.setPosition(0, 70, 0, 0);
+
         }else {
             imageFilter.release();
         }
@@ -65,9 +76,9 @@ public class EncodeRender implements GLSurfaceView.Renderer {
 
         mSurfaceTexture.getTransformMatrix(matrix);
 
+        imageFilter.init();
+
         //matrix 需要draw  画视频
         imageFilter.draw(mTextureId,matrix,mCanvasWidth,mCanvasHeight);
-
-
     }
 }
