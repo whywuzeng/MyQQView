@@ -232,6 +232,8 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
         super.onResume();
         glSurfaceView.onResume();
         cameraCompat.startPreview();
+        final CameraCompat.CameraSize outputSize = cameraCompat.getOutputSize();
+        glSurfaceView.setPreviewSize(outputSize.width,outputSize.height);
     }
 
     @Override

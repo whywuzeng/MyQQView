@@ -63,4 +63,8 @@ public class RecordSurfaceView extends GLSurfaceView implements SurfaceTexture.O
     public void setFilter(ImageFilter filter){
         mRenderer.setFilter(filter);
     }
+
+    public void setPreviewSize(int width,int height){
+        mRenderer.setPreviewSize(width,height);
+    }
 }

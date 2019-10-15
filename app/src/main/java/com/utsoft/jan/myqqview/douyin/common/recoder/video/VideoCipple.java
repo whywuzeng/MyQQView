@@ -4,8 +4,10 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaMuxer;
 import android.os.Handler;
+import android.text.TextUtils;
 
 import com.utsoft.jan.common.utils.ThreadUtil;
 import com.utsoft.jan.myqqview.douyin.common.C;
@@ -33,7 +35,6 @@ public class VideoCipple implements Recoder<VideoConfig> {
     private String mDataSource;
     private MediaExtractor mediaExtractor;
     private int mtrackIndex;
-    private long videoDuration;
     private Handler mHandler;
     private OutputSurface outputSurface;
     private InputSurface inputSurface;
@@ -47,6 +48,9 @@ public class VideoCipple implements Recoder<VideoConfig> {
     final Object lock = new Object();
 
     static ExecutorService executorService = Executors.newFixedThreadPool(4);
+    private String videoDuration;
+    private Long videoDrationL;
+    private long videoDuration2;
 
     public void init(String dataSource, String outputSource) throws IOException {
         mHandler = ThreadUtil.newHandlerThread("DecodeAndEncoder");
@@ -59,8 +63,20 @@ public class VideoCipple implements Recoder<VideoConfig> {
         //初始化解码
         mediaExtractor = new MediaExtractor();
         mediaExtractor.setDataSource(mDataSource);
+        initVideoInfo(mDataSource);
         initTrack();
 
+    }
+
+    private void initVideoInfo(String mDataSource){
+        final MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(mDataSource);
+        String durationS = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        retriever.release();
+        if (!TextUtils.isEmpty(durationS))
+        {
+            videoDrationL = Long.valueOf(durationS);
+        }
     }
 
 
@@ -110,18 +126,23 @@ public class VideoCipple implements Recoder<VideoConfig> {
         @Override
         public void run() {
             mediaExtractor.selectTrack(mtrackIndex);
+            //什么意思
+            final long firstSampleTime = mediaExtractor.getSampleTime();
+
             prepareCodec();
-            startEncode();
+            startEncode(firstSampleTime);
         }
     };
 
-    private void startEncode() {
+    private void startEncode(long firstSampleTime) {
         //这个作用
-        startEncodeAndDecode();
+        startEncodeAndDecode(firstSampleTime,videoDuration2);
     }
 
+    private static final String TAG = "VideoCipple";
+
     //开始编解码
-    private void startEncodeAndDecode() {
+    private void startEncodeAndDecode(long firstSampleTime, long videoDrationL) {
         ByteBuffer[] decoderBuffers = decoderByType.getInputBuffers();
         ByteBuffer[] encoderBuffers = encoderByType.getOutputBuffers();
 
@@ -142,7 +163,9 @@ public class VideoCipple implements Recoder<VideoConfig> {
                 if (inputIndex > 0) {
                     final ByteBuffer decoderBuffer = decoderBuffers[inputIndex];
                     sampleSize = mediaExtractor.readSampleData(decoderBuffer, 0);
-                    if (sampleSize >= 0) {
+                    final long dur = mediaExtractor.getSampleTime() - firstSampleTime;
+                    //Log.e(TAG, "startEncodeAndDecode:  mediaExtractor.getSampleTime()" +mediaExtractor.getSampleTime());
+                    if (dur < videoDrationL &&sampleSize >= 0) {
                         //根据时间来判断是否要 装数据.这里如果不根据呢
                         decoderByType.queueInputBuffer(inputIndex, 0, sampleSize, mediaExtractor.getSampleTime(), 0);
                         mediaExtractor.advance();
@@ -166,7 +189,7 @@ public class VideoCipple implements Recoder<VideoConfig> {
                 }
                 else {
 
-                    final boolean doRender = bufferInfo.size != 0;
+                    final boolean doRender = bufferInfo.size != 0 ;
 
                     decoderByType.releaseOutputBuffer(OutputBufIndex, doRender);
 
@@ -316,7 +339,7 @@ public class VideoCipple implements Recoder<VideoConfig> {
             final String formatstring = trackFormat.getString(MediaFormat.KEY_MIME);
             if (formatstring.equals(C.VideoParams.MIME_TYPE)) {
                 mtrackIndex = i;
-                videoDuration = trackFormat.containsKey(MediaFormat.KEY_DURATION) ? trackFormat.getLong(MediaFormat.KEY_DURATION) : 0;
+                videoDuration2 = trackFormat.containsKey(MediaFormat.KEY_DURATION) ? trackFormat.getLong(MediaFormat.KEY_DURATION) : 0;
 
             }
         }
