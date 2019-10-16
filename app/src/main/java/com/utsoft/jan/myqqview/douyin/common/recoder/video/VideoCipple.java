@@ -8,6 +8,7 @@ import android.media.MediaMetadataRetriever;
 import android.media.MediaMuxer;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.utsoft.jan.common.utils.ThreadUtil;
 import com.utsoft.jan.myqqview.douyin.common.C;
@@ -51,9 +52,13 @@ public class VideoCipple implements Recoder<VideoConfig> {
     private String videoDuration;
     private Long videoDrationL;
     private long videoDuration2;
+    private boolean released = false;
+    //开始时间
+    private long before;
 
     public void init(String dataSource, String outputSource) throws IOException {
         mHandler = ThreadUtil.newHandlerThread("DecodeAndEncoder");
+        before = System.currentTimeMillis();
         this.mDataSource = dataSource;
         mMediaMuxer = new MediaMuxer(outputSource, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
         decoderByType = MediaCodec.createDecoderByType(C.VideoParams.MIME_TYPE);
@@ -131,6 +136,7 @@ public class VideoCipple implements Recoder<VideoConfig> {
 
             prepareCodec();
             startEncode(firstSampleTime);
+            stop();
         }
     };
 
@@ -267,6 +273,7 @@ public class VideoCipple implements Recoder<VideoConfig> {
                             }
                         }
                         //LogUtil.d("startEncodeAndDecode: " + info.presentationTimeUs);
+                        //Video track source MPEG4Writer
                         mMediaMuxer.writeSampleData(muxVideoTrack, encoderData, info);
                     }
                     encoderByType.releaseOutputBuffer(encodeStatus, false);
@@ -282,6 +289,9 @@ public class VideoCipple implements Recoder<VideoConfig> {
 
     @Override
     public void stop() {
+        if (released) {
+            return;
+        }
         mediaExtractor.release();
 
         mMediaMuxer.stop();
@@ -295,6 +305,9 @@ public class VideoCipple implements Recoder<VideoConfig> {
         decoderByType.release();
         encoderByType.stop();
         encoderByType.release();
+        released = true;
+        final long after = System.currentTimeMillis();
+        Log.e(TAG, "stop: Total time" + (before - after));
     }
 
     @Override
@@ -317,14 +330,14 @@ public class VideoCipple implements Recoder<VideoConfig> {
         final int videoWidth = videoDecoderFormat.getInteger(MediaFormat.KEY_WIDTH);
         final int videoHeight = videoDecoderFormat.getInteger(MediaFormat.KEY_HEIGHT);
 
+        //初始化inputsurface
+        inputSurface = new InputSurface(encoderByType.createInputSurface());
+        inputSurface.MCurrent();
+
         outputSurface = new OutputSurface();
         outputSurface.setup(videoWidth, videoHeight);
         //取得outputsurface
         decoderByType.configure(videoDecoderFormat, outputSurface.getSurface(), null, 0);
-
-        //初始化inputsurface
-        inputSurface = new InputSurface(encoderByType.createInputSurface());
-        inputSurface.MCurrent();
 
 
         decoderByType.start();

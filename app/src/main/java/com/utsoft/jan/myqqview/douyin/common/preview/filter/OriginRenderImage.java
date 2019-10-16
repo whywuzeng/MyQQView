@@ -62,10 +62,11 @@ public class OriginRenderImage extends BaseRenderImageFilter {
 
     @Override
     protected void onChanged(int width, int height) {
-        mOutputTextureId = GLUtils.createTexture();
+        mOutputTextureId = GLUtils.createFrameTexture(width, height);
 
         aPositionLocation = glGetAttribLocation(mProgram, "aPosition");
         aTextureCoordLocation = glGetAttribLocation(mProgram, "aTextureCoord");
+
         uTexMatrixLocation = glGetUniformLocation(mProgram, "uTexMatrix");
 
         uTextureLocation = glGetUniformLocation(mProgram, "uTexture");

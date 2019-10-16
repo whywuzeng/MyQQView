@@ -75,9 +75,6 @@ public class RecordRenderDrawer extends BaseRenderImageFilter {
 
     @Override
     protected void onDraw(float[] texMatrix) {
-        clear();
-        useProgram();
-        viewPort(0, 0, width, height);
 
         GLES20.glEnableVertexAttribArray(av_Position);
         GLES20.glEnableVertexAttribArray(af_Position);

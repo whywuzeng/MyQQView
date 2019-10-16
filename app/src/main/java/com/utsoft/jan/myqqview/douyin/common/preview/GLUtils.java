@@ -130,6 +130,7 @@ public class GLUtils {
 
     private static int complieShader(int type, String shaderCode) {
         final int shaderObjectId = glCreateShader(type);
+        checkError();
         if (shaderObjectId == 0) {
             LogUtil.e("『ShaderUtil-compileShader』创建Shader失败");
             return 0;
@@ -219,5 +220,58 @@ public class GLUtils {
         if (GLES20.glGetError() != GLES20.GL_NO_ERROR) {
             Log.e(TAG, "createOutputTexture: " + GLES20.glGetError() );
         }
+    }
+
+
+    public static int createFrameTexture(int width, int height) {
+        if (width <= 0 || height <= 0) {
+            Log.e(TAG, "createOutputTexture: width or height is 0");
+            return -1;
+        }
+        int[] textures = new int[1];
+        GLES20.glGenTextures(1, textures, 0);
+        if (textures[0] == 0) {
+            Log.e(TAG, "createFrameTexture: glGenTextures is 0");
+            return -1;
+        }
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]);
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+        //设置环绕方向S，截取纹理坐标到[1/2n,1-1/2n]。将导致永远不会与border融合
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        //设置环绕方向T，截取纹理坐标到[1/2n,1-1/2n]。将导致永远不会与border融合
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+        //设置缩小过滤为使用纹理中坐标最接近的一个像素的颜色作为需要绘制的像素颜色
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+        //设置放大过滤为使用纹理中坐标最接近的若干个颜色，通过加权平均算法得到需要绘制的像素颜色
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+        checkError();
+
+        createRenderBuffer(width,height);
+
+        return textures[0];
+    }
+
+    public static void createRenderBuffer(int width, int height){
+        // 创建RenderBuffer Object并且绑定它
+        int[] values = new int[1];
+        GLES20.glGenRenderbuffers(1, values, 0);
+        int mRenderBuffer = values[0];
+        GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, mRenderBuffer);
+
+        //为我们的RenderBuffer申请存储空间
+        GLES20.glRenderbufferStorage(GLES20.GL_RENDERBUFFER, GLES20.GL_DEPTH_COMPONENT16, width, height);
+
+        // 将renderBuffer挂载到frameBuffer的depth attachment 上。就上面申请了OffScreenId和FrameBuffer相关联
+        GLES20.glFramebufferRenderbuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_DEPTH_ATTACHMENT, GLES20.GL_RENDERBUFFER, mRenderBuffer);
+
+        //// 将text2d挂载到frameBuffer的color attachment上
+        //GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, textureId, 0);
+
+        // 先不使用FrameBuffer，将其切换掉。到开始绘制的时候，在绑定回来
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+
+        /*************************另一种写法******************************************/
+
+        /*************************另一种写法******************************************/
     }
 }

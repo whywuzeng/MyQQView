@@ -42,6 +42,7 @@ public class EncodeRender implements GLSurfaceView.Renderer {
     private OriginRenderImage originRenderImage;
     private WaterMarkRenderDrawer mWaterMarkDrawer;
     private RecordRenderDrawer mRecordDrawer;
+    private RecordRenderDrawer mEndRecord;
 
     private static final String TAG = "EncodeRender";
 
@@ -49,6 +50,7 @@ public class EncodeRender implements GLSurfaceView.Renderer {
         originRenderImage = new OriginRenderImage();
         mWaterMarkDrawer = new WaterMarkRenderDrawer(context);
         mRecordDrawer = new RecordRenderDrawer();
+        mEndRecord = new RecordRenderDrawer();
         this.mFrameBuffer = 0;
         this.mTextureId = 0;
     }
@@ -58,12 +60,16 @@ public class EncodeRender implements GLSurfaceView.Renderer {
         this.mTextureId = texture;
     }
 
+    // 挂载mFrameBuffer 容器，
     public void bindFrameBuffer(int textureId) {
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBuffer);
+        //为FrameBuffer挂载Texture[1]来存储颜色
         GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, textureId, 0);
+
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBuffer);
     }
 
     public void unBindFrameBuffer() {
+        //解绑FrameBuffer
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
     }
 
@@ -76,6 +82,9 @@ public class EncodeRender implements GLSurfaceView.Renderer {
         originRenderImage.create();
         mWaterMarkDrawer.create();
         mRecordDrawer.create();
+
+        //结束record
+        mEndRecord.create();
     }
 
     public void surfaceChangedSize(int width, int height) {
@@ -83,18 +92,28 @@ public class EncodeRender implements GLSurfaceView.Renderer {
         originRenderImage.surfaceChangedSize(width, height);
         mWaterMarkDrawer.surfaceChangedSize(width,height);
         mRecordDrawer.surfaceChangedSize(width,height);
+        mEndRecord.surfaceChangedSize(width, height);
 
         this.originRenderImage.setInputTextureId(mTextureId);
         final int outputTextureId = this.originRenderImage.getOutputTextureId();
         mWaterMarkDrawer.setInputTextureId(outputTextureId);
         mRecordDrawer.setInputTextureId(outputTextureId);
+        mEndRecord.setInputTextureId(outputTextureId);
     }
 
     public void drawRender(BaseRenderImageFilter drawer, boolean useFrameBuffer, long timestamp, float[] transformMatrix) {
         if (useFrameBuffer) {
             bindFrameBuffer(drawer.getOutputTextureId());
         }
-        drawer.draw(timestamp, transformMatrix);
+        if (useFrameBuffer) {
+            if (GLES20.glCheckFramebufferStatus(GLES20.GL_FRAMEBUFFER)
+                    == GLES20.GL_FRAMEBUFFER_COMPLETE) {
+                drawer.draw(timestamp, transformMatrix);
+            }
+        }
+        else {
+            drawer.draw(timestamp, transformMatrix);
+        }
         if (useFrameBuffer) {
             unBindFrameBuffer();
         }
@@ -106,9 +125,10 @@ public class EncodeRender implements GLSurfaceView.Renderer {
             return;
         }
         drawRender(originRenderImage, true, timestamp, transformMatrix);
+        //drawRender(mRecordDrawer, false, timestamp, transformMatrix);
         // 绘制顺序会控制着 水印绘制哪一层
         drawRender(mWaterMarkDrawer, true, timestamp, transformMatrix);
-        drawRender(mRecordDrawer, false, timestamp, transformMatrix);
+        //drawRender(mEndRecord,false,timestamp,transformMatrix);
     }
 
     @Override
@@ -143,6 +163,5 @@ public class EncodeRender implements GLSurfaceView.Renderer {
         mSurfaceTexture.getTransformMatrix(matrix);
 
         draw(0,matrix);
-
     }
 }
