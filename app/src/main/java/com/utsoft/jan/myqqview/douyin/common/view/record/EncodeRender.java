@@ -28,6 +28,7 @@ import javax.microedition.khronos.opengles.GL10;
 public class EncodeRender implements GLSurfaceView.Renderer {
 
     private int mTextureId;
+    private int mRenderBuffer;
 
     public SurfaceTexture getSurfaceTexture() {
         return mSurfaceTexture;
@@ -62,10 +63,13 @@ public class EncodeRender implements GLSurfaceView.Renderer {
 
     // 挂载mFrameBuffer 容器，
     public void bindFrameBuffer(int textureId) {
+
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBuffer);
         //为FrameBuffer挂载Texture[1]来存储颜色
         GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0, GLES20.GL_TEXTURE_2D, textureId, 0);
 
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBuffer);
+        // 将renderBuffer挂载到frameBuffer的depth attachment 上。就上面申请了OffScreenId和FrameBuffer相关联
+        GLES20.glFramebufferRenderbuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_DEPTH_ATTACHMENT, GLES20.GL_RENDERBUFFER, mRenderBuffer);
     }
 
     public void unBindFrameBuffer() {
@@ -87,8 +91,22 @@ public class EncodeRender implements GLSurfaceView.Renderer {
         mEndRecord.create();
     }
 
+    private int createRenderBuffer(int width, int height){
+        int[] values = new int[1];
+        GLES20.glGenRenderbuffers(1, values, 0);
+        int mRenderBuffer = values[0];
+        GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, mRenderBuffer);
+
+        //为我们的RenderBuffer申请存储空间
+        GLES20.glRenderbufferStorage(GLES20.GL_RENDERBUFFER, GLES20.GL_DEPTH_COMPONENT16, width, height);
+
+        return values[0];
+    }
+
     public void surfaceChangedSize(int width, int height) {
         mFrameBuffer = GLUtils.createFrameBuffer();
+        mRenderBuffer = createRenderBuffer(width,height);
+
         originRenderImage.surfaceChangedSize(width, height);
         mWaterMarkDrawer.surfaceChangedSize(width,height);
         mRecordDrawer.surfaceChangedSize(width,height);
@@ -124,10 +142,10 @@ public class EncodeRender implements GLSurfaceView.Renderer {
             Log.e(TAG, "draw: mInputTexture or mFramebuffer or list is zero");
             return;
         }
-        drawRender(originRenderImage, true, timestamp, transformMatrix);
+        //drawRender(originRenderImage, true, timestamp, transformMatrix);
         //drawRender(mRecordDrawer, false, timestamp, transformMatrix);
         // 绘制顺序会控制着 水印绘制哪一层
-        drawRender(mWaterMarkDrawer, true, timestamp, transformMatrix);
+        drawRender(mWaterMarkDrawer, false, timestamp, transformMatrix);
         //drawRender(mEndRecord,false,timestamp,transformMatrix);
     }
 

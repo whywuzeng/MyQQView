@@ -1,10 +1,9 @@
 package com.utsoft.jan.myqqview.douyin.common.preview.filter;
 
 import android.opengl.GLES20;
-import android.opengl.GLES30;
 import android.util.Log;
 
-import com.utsoft.jan.myqqview.douyin.common.preview.RendererInfo;
+import com.utsoft.jan.myqqview.douyin.common.preview.RendererInfo2;
 import com.utsoft.jan.myqqview.douyin.common.preview.TextrueProgram;
 
 /**
@@ -17,7 +16,7 @@ import com.utsoft.jan.myqqview.douyin.common.preview.TextrueProgram;
 public abstract class BaseRenderImageFilter {
 
     //数据顶点
-    protected RendererInfo mRendererInfo = new RendererInfo();
+    protected RendererInfo2 mRendererInfo = new RendererInfo2();
 
     //程序点
     protected int mProgram;
@@ -34,6 +33,7 @@ public abstract class BaseRenderImageFilter {
 
         //初始化 mpro
         mProgram = new TextrueProgram(getVertexSource(), getFragmentSource()).getmProgramId();
+        //ShapeHelper.validateProgram(mProgram);
         onCreated();
     }
 
@@ -60,7 +60,7 @@ public abstract class BaseRenderImageFilter {
 
     protected void clear() {
         GLES20.glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-        GLES20.glClear(GLES30.GL_COLOR_BUFFER_BIT | GLES30.GL_DEPTH_BUFFER_BIT);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
     }
 
     public abstract void setInputTextureId(int textureId);

@@ -14,17 +14,17 @@ import java.nio.FloatBuffer;
 public class RendererInfo2 {
 
     private final static float[] FULL_RECT_VERTEX = {
-            -1.0f,  1.0f,
-            -1.0f, -1.0f,
-            1.0f, 1.0f,
-            1.0f,  -1.0f,
+            -1f, -1f,// 左下角
+            1f, -1f, // 右下角
+            -1f, 1f, // 左上角
+            1f, 1f,  // 右上角
     };
 
     private final static float[] FULL_RECT_TEXTURE_VERTEX = {
-            0.0f, 1.0f,
-            0.0f, 0.0f,
-            1.0f, 1.0f,
-            1.0f, 0.0f,
+            0f, 0f, //左下角
+            1f, 0f, //右下角
+            0f, 1f,// 左上角
+            1f, 1f, // 右上角
     };
 
     private FloatBuffer rectVertex;

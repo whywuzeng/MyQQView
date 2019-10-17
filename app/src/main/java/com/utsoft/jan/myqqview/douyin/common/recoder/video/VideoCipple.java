@@ -335,7 +335,7 @@ public class VideoCipple implements Recoder<VideoConfig> {
         inputSurface.MCurrent();
 
         outputSurface = new OutputSurface();
-        outputSurface.setup(videoWidth, videoHeight);
+        outputSurface.setup(1080, 1920);
         //取得outputsurface
         decoderByType.configure(videoDecoderFormat, outputSurface.getSurface(), null, 0);
 

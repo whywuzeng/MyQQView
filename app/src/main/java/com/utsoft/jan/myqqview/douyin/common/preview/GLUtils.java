@@ -109,7 +109,7 @@ public class GLUtils {
         int[] linkStatus = new int[1];
         glGetProgramiv(programId,GL_LINK_STATUS,linkStatus,0);
         if (linkStatus[0] == 0){
-            LogUtil.d(glGetProgramInfoLog(programId));
+            LogUtil.e("Program Log"+glGetProgramInfoLog(programId));
             glDeleteProgram(programId);
             return 0;
         }
@@ -142,6 +142,7 @@ public class GLUtils {
         int[] completeId = new int[1];
         glGetShaderiv(shaderObjectId, GL_COMPILE_STATUS, completeId, 0);
         if (completeId[0] == 0) {
+            Log.e("Load Shader Failed", "Compilation\n" + GLES20.glGetShaderInfoLog(shaderObjectId));
             LogUtil.e("『ShaderUtil-compileShader』编译Shader失败");
             glDeleteShader(shaderObjectId);
             return 0;
@@ -245,9 +246,7 @@ public class GLUtils {
         //设置放大过滤为使用纹理中坐标最接近的若干个颜色，通过加权平均算法得到需要绘制的像素颜色
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
         checkError();
-
-        createRenderBuffer(width,height);
-
+        //createRenderBuffer(width,height);
         return textures[0];
     }
 

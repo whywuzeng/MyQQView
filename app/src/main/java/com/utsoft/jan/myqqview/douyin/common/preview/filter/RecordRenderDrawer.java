@@ -56,6 +56,11 @@ public class RecordRenderDrawer extends BaseRenderImageFilter {
         onChanged(width, height);
     }
 
+    @Override
+    protected void clear() {
+        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+    }
 
     @Override
     protected void onCreated() {
@@ -78,8 +83,6 @@ public class RecordRenderDrawer extends BaseRenderImageFilter {
 
         GLES20.glEnableVertexAttribArray(av_Position);
         GLES20.glEnableVertexAttribArray(af_Position);
-//        GLES20.glVertexAttribPointer(av_Position, CoordsPerVertexCount, GLES20.GL_FLOAT, false, VertexStride, mVertexBuffer);
-//        GLES20.glVertexAttribPointer(af_Position, CoordsPerTextureCount, GLES20.GL_FLOAT, false, TextureStride, mDisplayTextureBuffer);
         mRendererInfo.getRectVertex().position(0);
         GLES20.glVertexAttribPointer(av_Position, 2, GLES20.GL_FLOAT, false, 0, mRendererInfo.getRectVertex());
         checkGlError("avPosition");
@@ -93,9 +96,9 @@ public class RecordRenderDrawer extends BaseRenderImageFilter {
         GLES20.glUniform1i(s_Texture, 0);
         // 绘制 GLES20.GL_TRIANGLE_STRIP:复用坐标
         GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
         GLES20.glDisableVertexAttribArray(av_Position);
         GLES20.glDisableVertexAttribArray(af_Position);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
     }
 
     @Override
@@ -116,7 +119,6 @@ public class RecordRenderDrawer extends BaseRenderImageFilter {
                 "varying vec2 v_texPo;\n" +
                 "uniform sampler2D s_Texture;\n" +
                 "void main() {\n" +
-                "   vec4 tc = texture2D(s_Texture, v_texPo);\n" +
                 "   gl_FragColor = texture2D(s_Texture, v_texPo);\n" +
                 "}";
         return source;
