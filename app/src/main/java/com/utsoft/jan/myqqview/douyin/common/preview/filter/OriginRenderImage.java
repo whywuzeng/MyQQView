@@ -3,8 +3,6 @@ package com.utsoft.jan.myqqview.douyin.common.preview.filter;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 
-import com.utsoft.jan.myqqview.douyin.common.preview.GLUtils;
-
 import static android.opengl.GLES20.GL_FLOAT;
 import static android.opengl.GLES20.GL_TEXTURE0;
 import static android.opengl.GLES20.GL_TRIANGLE_STRIP;
@@ -26,7 +24,7 @@ import static android.opengl.GLES20.glVertexAttribPointer;
  * <p>
  * com.utsoft.jan.myqqview.douyin.common.preview.filter
  */
-public class OriginRenderImage extends BaseRenderImageFilter {
+public class OriginRenderImage extends BaseRenderImageFilter2 {
 
     private int mOutputTextureId;
     private int mInputTextureId;
@@ -62,7 +60,10 @@ public class OriginRenderImage extends BaseRenderImageFilter {
 
     @Override
     protected void onChanged(int width, int height) {
-        mOutputTextureId = GLUtils.createFrameTexture(width, height);
+        //todo 测试第三种类型 临时关掉
+        //mOutputTextureId = GLUtils.createFrameTexture(width, height);
+
+        mOutputTextureId = 1;
 
         aPositionLocation = glGetAttribLocation(mProgram, "aPosition");
         aTextureCoordLocation = glGetAttribLocation(mProgram, "aTextureCoord");

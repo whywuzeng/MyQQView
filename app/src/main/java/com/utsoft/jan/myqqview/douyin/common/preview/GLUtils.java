@@ -180,7 +180,6 @@ public class GLUtils {
 
     public static void unBindFrameBuffer(){
         //7. 解绑纹理和FBO
-        GLES20.glBindTexture(GL_TEXTURE_2D, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
@@ -273,4 +272,6 @@ public class GLUtils {
 
         /*************************另一种写法******************************************/
     }
+
+
 }

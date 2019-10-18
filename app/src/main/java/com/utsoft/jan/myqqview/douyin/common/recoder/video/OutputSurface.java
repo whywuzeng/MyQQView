@@ -3,9 +3,9 @@ package com.utsoft.jan.myqqview.douyin.common.recoder.video;
 import android.graphics.SurfaceTexture;
 import android.view.Surface;
 
-import com.utsoft.jan.common.app.AppProfile;
 import com.utsoft.jan.myqqview.douyin.common.view.record.EncodeRender;
 import com.utsoft.jan.myqqview.douyin.common.view.record.EncodeRender2;
+import com.utsoft.jan.myqqview.douyin.common.view.record.EncodeRender3;
 import com.utsoft.jan.myqqview.douyin.common.view.record.RecordRender;
 
 /**
@@ -25,6 +25,8 @@ public class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
 
     private EncodeRender2 encodeRender2;
 
+    private EncodeRender3 encodeRender3;
+
     private RecordRender mRecordRender;
 
     public Surface getSurface() {
@@ -33,15 +35,20 @@ public class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
 
 
     public void setup(int videoWidth, int videoHeight){
-        encodeRender = new EncodeRender(AppProfile.getContext());
-        encodeRender.onSurfaceCreated(null,null);
-        encodeRender.onSurfaceChanged(null,videoWidth,videoHeight);
-        surfaceTexture = encodeRender.getSurfaceTexture();
+        //encodeRender = new EncodeRender(AppProfile.getContext());
+        //encodeRender.onSurfaceCreated(null,null);
+        //encodeRender.onSurfaceChanged(null,videoWidth,videoHeight);
+        //surfaceTexture = encodeRender.getSurfaceTexture();
 
         //encodeRender2 = new EncodeRender2();
         //encodeRender2.onSurfaceCreated(null,null);
         //encodeRender2.onSurfaceChanged(null,videoWidth,videoHeight);
         //surfaceTexture = encodeRender2.getSurfaceTexture();
+
+        encodeRender3 = new EncodeRender3();
+        encodeRender3.onSurfaceCreated(null,null);
+        encodeRender3.onSurfaceChanged(null,videoWidth,videoHeight);
+        surfaceTexture = encodeRender3.getSurfaceTexture();
 
         surfaceTexture.setOnFrameAvailableListener(this);
         mSurface = new Surface(surfaceTexture);
@@ -67,8 +74,9 @@ public class OutputSurface implements SurfaceTexture.OnFrameAvailableListener {
 
 
     public void drawImage(long presentationTime) {
-        encodeRender.onDrawFrame(null);
+        //encodeRender.onDrawFrame(null);
         //encodeRender2.onDrawFrame(null);
+        encodeRender3.onDrawFrame(null);
     }
 
     @Override

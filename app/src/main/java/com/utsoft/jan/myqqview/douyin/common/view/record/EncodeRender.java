@@ -9,7 +9,7 @@ import android.opengl.GLSurfaceView;
 import android.util.Log;
 
 import com.utsoft.jan.myqqview.douyin.common.preview.GLUtils;
-import com.utsoft.jan.myqqview.douyin.common.preview.filter.BaseRenderImageFilter;
+import com.utsoft.jan.myqqview.douyin.common.preview.filter.BaseRenderImageFilter2;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.OriginRenderImage;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.RecordRenderDrawer;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.WaterMarkRenderDrawer;
@@ -119,7 +119,7 @@ public class EncodeRender implements GLSurfaceView.Renderer {
         mEndRecord.setInputTextureId(outputTextureId);
     }
 
-    public void drawRender(BaseRenderImageFilter drawer, boolean useFrameBuffer, long timestamp, float[] transformMatrix) {
+    public void drawRender(BaseRenderImageFilter2 drawer, boolean useFrameBuffer, long timestamp, float[] transformMatrix) {
         if (useFrameBuffer) {
             bindFrameBuffer(drawer.getOutputTextureId());
         }

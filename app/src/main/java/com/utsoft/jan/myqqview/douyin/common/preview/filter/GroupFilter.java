@@ -2,6 +2,8 @@ package com.utsoft.jan.myqqview.douyin.common.preview.filter;
 
 import android.opengl.GLES20;
 
+import com.utsoft.jan.myqqview.douyin.common.preview.GLUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -25,7 +27,7 @@ public class GroupFilter extends ImageFilter{
 
     @Override
     public void init() {
-        super.init();
+        //super.init();
         if (mFilterQueue ==null)
         mFilterQueue = new ConcurrentLinkedDeque<>();
         if (mFilters == null)
@@ -73,10 +75,12 @@ public class GroupFilter extends ImageFilter{
                     GLES20.GL_TEXTURE_2D, fTexture[textureIndex%2], 0);
             GLES20.glFramebufferRenderbuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_DEPTH_ATTACHMENT,
                     GLES20.GL_RENDERBUFFER, fRender[0]);
+            GLUtils.checkError();
             GLES20.glViewport(0,0,width,height);
-            filter.init();
             if(textureIndex==0){
-                filter.draw(this.mTextureId,matrix,width,height);
+                final WaterMarkFilter filter1 = (WaterMarkFilter) filter;
+                filter1.init();
+                filter1.onDraw(this.mTextureId,matrix);
             }else{
                 filter.draw(fTexture[(textureIndex-1)%2],matrix,width,height);
             }
@@ -139,7 +143,7 @@ public class GroupFilter extends ImageFilter{
     }
 
     public int getOutputTexture(){
-        //return size==0?mTextureId:fTexture[(textureIndex-1)%2];
-        return mTextureId;
+        return size==0?mTextureId:fTexture[(textureIndex-1)%2];
+        //return mTextureId;
     }
 }

@@ -1,11 +1,20 @@
 package com.utsoft.jan.myqqview.douyin.common.view.record;
 
+import android.graphics.BitmapFactory;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
+import com.utsoft.jan.common.app.AppProfile;
+import com.utsoft.jan.myqqview.R;
 import com.utsoft.jan.myqqview.douyin.common.preview.GLUtils;
-import com.utsoft.jan.myqqview.douyin.common.preview.filter.ImageFilter;
+import com.utsoft.jan.myqqview.douyin.common.preview.filter.BaseRenderImageFilter;
+import com.utsoft.jan.myqqview.douyin.common.preview.filter.GroupFilter;
+import com.utsoft.jan.myqqview.douyin.common.preview.filter.OriginRenderImage;
+import com.utsoft.jan.myqqview.douyin.common.preview.filter.WaterMarkFilter;
+import com.utsoft.jan.myqqview.douyin.common.preview.filter.carmera.NoFilter;
+import com.utsoft.jan.myqqview.douyin.common.preview.filter.carmera.ProcessFilter;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -28,19 +37,40 @@ public class EncodeRender3 implements GLSurfaceView.Renderer {
 
     private int mFrameBuffer;
 
-    private ImageFilter imageFilter;
+    private OriginRenderImage originRenderImage;
 
-    //private RotationOESFilter mPreFilter;
+    private GroupFilter groupFilter;
+
+    private ProcessFilter mProcessFilter;
+
+    private BaseRenderImageFilter mShow;
+
 
     private static final String TAG = "EncodeRender";
+
+    //这个类的 fbo
+    private int[] fFrame = new int[1];
+    private int[] fTexture = new int[1];
+
+    ////////////////////////////
+
 
     public EncodeRender3() {
         this.mFrameBuffer = 0;
         this.mTextureId = 0;
+        originRenderImage =new OriginRenderImage();
+        mProcessFilter = new ProcessFilter();
+        mShow = new NoFilter();
+        groupFilter = new GroupFilter();
     }
 
     public SurfaceTexture getSurfaceTexture() {
         return mSurfaceTexture;
+    }
+
+    //设置最开始 纹理ID
+    public void setInputTexture(int texture) {
+        this.mTextureId = texture;
     }
 
     @Override
@@ -48,11 +78,19 @@ public class EncodeRender3 implements GLSurfaceView.Renderer {
         //OES展示视频
         mTextureId = GLUtils.createTextureObject(GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
         mSurfaceTexture = new SurfaceTexture(mTextureId);
-        if (imageFilter == null) {
-            imageFilter = new ImageFilter();
-        } else {
-            imageFilter.release();
-        }
+
+        originRenderImage.create();
+        //直接调用
+        mProcessFilter.onCreated();
+
+        mShow.create();
+
+        groupFilter.init();
+
+        final WaterMarkFilter drawer = new WaterMarkFilter();
+        drawer.setWaterMark(BitmapFactory.decodeResource(AppProfile.getContext().getResources(), R.mipmap.bufuhanzhe));
+        drawer.setPosition(0, 70, 0, 0);
+        groupFilter.addFilter(drawer);
 
     }
 
@@ -60,14 +98,29 @@ public class EncodeRender3 implements GLSurfaceView.Renderer {
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         mCanvasWidth = width;
         mCanvasHeight = height;
+
+        GLES20.glDeleteFramebuffers(1, fFrame, 0);
+        GLES20.glDeleteTextures(1, fTexture, 0);
+
+        GLES20.glGenFramebuffers(1,fFrame,0);
+        //创建一个 textureId ，创建一个buffersFrame textureId
+        fTexture[0] = GLUtils.createFrameTexture(width,height);
+
+        originRenderImage.surfaceChangedSize(width,height);
+        originRenderImage.setInputTextureId(mTextureId);
+
+        groupFilter.setSize(width,height);
+
+        //直接调用
+        mProcessFilter.onChanged(width,height);
+
+        //调用父类
+        mShow.surfaceChangedSize(width,height);
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
 
-        if (imageFilter == null) {
-            return;
-        }
 
         float matrix[] = new float[16];
         if (mSurfaceTexture!=null)
@@ -79,9 +132,19 @@ public class EncodeRender3 implements GLSurfaceView.Renderer {
 
         mSurfaceTexture.getTransformMatrix(matrix);
 
-        imageFilter.init();
+        GLUtils.bindFrameTexture(fFrame[0],fTexture[0]);
 
-        imageFilter.draw(mTextureId, matrix, mCanvasWidth, mCanvasHeight);
+        originRenderImage.draw(0,matrix);
+        GLUtils.unBindFrameBuffer();
 
+        groupFilter.draw(matrix,fTexture[0]);
+
+        mProcessFilter.setInputTextureId(groupFilter.getOutputTexture());
+        mProcessFilter.draw();
+
+        GLES20.glViewport(0,0,mCanvasWidth,mCanvasHeight);
+
+        mShow.setInputTextureId(mProcessFilter.getOutputTextureId());
+        mShow.draw();
     }
 }

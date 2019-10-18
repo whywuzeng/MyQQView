@@ -6,7 +6,7 @@ import android.util.Log;
 /**
  * Created By Chengjunsen on 2018/9/21
  */
-public class RecordRenderDrawer extends BaseRenderImageFilter {
+public class RecordRenderDrawer extends BaseRenderImageFilter2 {
     // 绘制的纹理 ID
     private int mTextureId;
 

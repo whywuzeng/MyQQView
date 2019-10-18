@@ -1,20 +1,9 @@
 package com.utsoft.jan.myqqview.douyin.common.preview.filter;
 
 import android.graphics.Bitmap;
-import android.opengl.GLES20;
 
 import com.utsoft.jan.myqqview.douyin.common.preview.GLUtils;
-
-import static android.opengl.GLES20.GL_COLOR_BUFFER_BIT;
-import static android.opengl.GLES20.GL_FLOAT;
-import static android.opengl.GLES20.GL_TEXTURE0;
-import static android.opengl.GLES20.GL_TRIANGLE_STRIP;
-import static android.opengl.GLES20.glActiveTexture;
-import static android.opengl.GLES20.glBindTexture;
-import static android.opengl.GLES20.glClear;
-import static android.opengl.GLES20.glDrawArrays;
-import static android.opengl.GLES20.glUniformMatrix4fv;
-import static android.opengl.GLES20.glVertexAttribPointer;
+import com.utsoft.jan.myqqview.douyin.common.preview.filter.carmera.NoFilter;
 
 /**
  * Created by Administrator on 2019/10/7.
@@ -51,7 +40,9 @@ public class WaterMarkFilter extends ImageFilter{
     private Bitmap mBitmap;
     private int mTextureId;
 
-    private NoFilter mNoFilter;
+    private com.utsoft.jan.myqqview.douyin.common.preview.filter.carmera.NoFilter mNoFilter;
+
+    private int textureIDI;
 
     public void setWaterMark(Bitmap bitmap){
         if(this.mBitmap!=null && !mBitmap.isRecycled()){
@@ -59,6 +50,9 @@ public class WaterMarkFilter extends ImageFilter{
             mBitmap = null;
         }
         this.mBitmap=bitmap;
+
+        textureIDI = GLUtils.loadBitmapTexture(mBitmap);
+        mNoFilter.setInputTextureId(textureIDI);
     }
 
     public void setPosition(int x,int y,int width,int height){
@@ -85,8 +79,10 @@ public class WaterMarkFilter extends ImageFilter{
 
     @Override
     public void init() {
-        super.init();
+        //super.init();
         mNoFilter = new NoFilter();
+        mNoFilter.create();
+        mNoFilter.surfaceChangedSize(w,h);
     }
 
     @Override
@@ -103,26 +99,28 @@ public class WaterMarkFilter extends ImageFilter{
     protected void onDraw(int textureId, float[] texMatrix) {
         //GLES20.glViewport(x,y,w == 0 ? mBitmap.getWidth():w,h==0?mBitmap.getHeight():h);
 
-        final int textureIDI = GLUtils.loadBitmapTexture(mBitmap);
-        GLES20.glViewport(0,50, (int) (mBitmap.getWidth()*1.5f), (int) (mBitmap.getHeight()*1.5f));
-//        GLES20.glViewport(0,0,width,height);
-        GLES20.glEnable(GLES20.GL_BLEND);
-        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+//        GLES20.glViewport(0,50, (int) (mBitmap.getWidth()*1.5f), (int) (mBitmap.getHeight()*1.5f));
+////        GLES20.glViewport(0,0,width,height);
+//        GLES20.glEnable(GLES20.GL_BLEND);
+//        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+//
+//        glUniformMatrix4fv(uTexMatrixLocation,1,false,texMatrix,0);
+//        checkGlError("glUniformMatrix4fv");
+//        mRendererInfo.getRectVertex().position(0);
+//        glVertexAttribPointer(aPositionLocation,2,GL_FLOAT,false,0,mRendererInfo.getRectVertex());
+//        checkGlError("glVertexAttribPointer");
+//        mRendererInfo.getTexVertext().position(0);
+//        glVertexAttribPointer(aTextureCoordLocation,2,GL_FLOAT,false,0,mRendererInfo.getTexVertext());
+//        checkGlError("glVertexAttribPointer");
+//        glActiveTexture(GL_TEXTURE0);
+//        //绑定好 申请textureId 绑定好纹理类型.已经绑定一次了。
+//        glBindTexture(GLES20.GL_TEXTURE_2D,textureIDI);
+//        glClear(GL_COLOR_BUFFER_BIT);
+//        glDrawArrays(GL_TRIANGLE_STRIP,0,4);
+//
+//        GLES20.glDisable(GLES20.GL_BLEND);
 
-        glUniformMatrix4fv(uTexMatrixLocation,1,false,texMatrix,0);
-        checkGlError("glUniformMatrix4fv");
-        mRendererInfo.getRectVertex().position(0);
-        glVertexAttribPointer(aPositionLocation,2,GL_FLOAT,false,0,mRendererInfo.getRectVertex());
-        checkGlError("glVertexAttribPointer");
-        mRendererInfo.getTexVertext().position(0);
-        glVertexAttribPointer(aTextureCoordLocation,2,GL_FLOAT,false,0,mRendererInfo.getTexVertext());
-        checkGlError("glVertexAttribPointer");
-        glActiveTexture(GL_TEXTURE0);
-        //绑定好 申请textureId 绑定好纹理类型.已经绑定一次了。
-        glBindTexture(GLES20.GL_TEXTURE_2D,textureIDI);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDrawArrays(GL_TRIANGLE_STRIP,0,4);
+        mNoFilter.draw();
 
-        GLES20.glDisable(GLES20.GL_BLEND);
     }
 }

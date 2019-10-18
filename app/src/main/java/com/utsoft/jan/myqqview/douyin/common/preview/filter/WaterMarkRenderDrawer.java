@@ -11,7 +11,7 @@ import com.utsoft.jan.myqqview.douyin.common.preview.GLUtils;
 /**
  * Created By Chengjunsen on 2018/8/29
  */
-public class WaterMarkRenderDrawer extends BaseRenderImageFilter{
+public class WaterMarkRenderDrawer extends BaseRenderImageFilter2{
     private int mMarkTextureId;
     private int mInputTextureId;
     private Bitmap mBitmap;
