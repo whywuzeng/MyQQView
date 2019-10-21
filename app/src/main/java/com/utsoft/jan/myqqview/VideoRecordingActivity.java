@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Toast;
 
 import com.utsoft.jan.common.app.PresenterActivity;
 import com.utsoft.jan.common.utils.LogUtil;
@@ -26,6 +27,7 @@ import com.utsoft.jan.myqqview.douyin.common.view.record.RecordSurfaceView;
 import com.utsoft.jan.myqqview.douyin.effect.activity.AfterEffectActivity;
 import com.utsoft.jan.myqqview.douyin.recoder.persenter.RecordContract;
 import com.utsoft.jan.myqqview.douyin.recoder.persenter.RecordPersenter;
+import com.utsoft.jan.myqqview.utils.OpenGLJinLib;
 
 /**
  * Created by Administrator on 2019/9/3.
@@ -86,6 +88,8 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
                 //}
 
                 mPresenter.startRecording(mEGLContext, cameraCompat.getOutputSize().width, cameraCompat.getOutputSize().height);
+                final String hellostr = OpenGLJinLib.stringHello();
+                Toast.makeText(VideoRecordingActivity.this,hellostr,Toast.LENGTH_LONG).show();
             }
 
             @Override

@@ -1,19 +1,15 @@
 package com.utsoft.jan.myqqview.douyin.common.view.record;
 
-import android.graphics.BitmapFactory;
 import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
-import com.utsoft.jan.common.app.AppProfile;
-import com.utsoft.jan.myqqview.R;
 import com.utsoft.jan.myqqview.douyin.common.preview.GLUtils;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.GroupFilter;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.ImageFilter;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.NoFilter;
-import com.utsoft.jan.myqqview.douyin.common.preview.filter.WaterMarkFilter;
 import com.utsoft.jan.myqqview.douyin.common.recoder.video.VideoFrameData;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -33,7 +29,6 @@ import static android.opengl.GLES20.glTexImage2D;
 public class RecordRender implements GLSurfaceView.Renderer {
 
     private final NoFilter showFilter;
-    private final WaterMarkFilter waterMarkFilter;
     private RecordSurfaceView mTarget;
     private int mTextureId;
     private SurfaceTexture mSurfaceTexture;
@@ -58,9 +53,9 @@ public class RecordRender implements GLSurfaceView.Renderer {
         mBeFilter = new GroupFilter();
         showFilter = new NoFilter();
 
-        waterMarkFilter = new WaterMarkFilter();
-        waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(AppProfile.getContext().getResources(), R.mipmap.bufuhanzhe));
-        waterMarkFilter.setPosition(0, 70, 0, 0);
+        //waterMarkFilter = new WaterMarkFilter();
+        //waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(AppProfile.getContext().getResources(), R.mipmap.bufuhanzhe));
+        //waterMarkFilter.setPosition(0, 70, 0, 0);
     }
 
     @Override
@@ -140,18 +135,18 @@ public class RecordRender implements GLSurfaceView.Renderer {
 
 
         mSurfaceTexture.getTransformMatrix(mMatrix);
-        waterMarkFilter.init();
+        //waterMarkFilter.init();
         //        imageFilter.draw(mTextureId,mMatrix,mCanvasWidth,mCanvasHeight);
 
         if (mOldFilter != null) {
-            mOldFilter.init();
-            GLUtils.bindFrameTexture(fFrame[0], fTexture[0]);
-            mOldFilter.draw(mTextureId, mMatrix, mCanvasWidth, mCanvasHeight);
-            GLUtils.unBindFrameBuffer();
+            //mOldFilter.init();
+            //GLUtils.bindFrameTexture(fFrame[0], fTexture[0]);
+            //mOldFilter.draw(mTextureId, mMatrix, mCanvasWidth, mCanvasHeight);
+            //GLUtils.unBindFrameBuffer();
 
-            GLUtils.bindFrameTexture(fFrame[0], fTexture[0]);
-            waterMarkFilter.draw(mTextureId, mMatrix, mCanvasWidth, mCanvasHeight);
-            GLUtils.unBindFrameBuffer();
+            //GLUtils.bindFrameTexture(fFrame[0], fTexture[0]);
+            //waterMarkFilter.draw(mTextureId, mMatrix, mCanvasWidth, mCanvasHeight);
+            //GLUtils.unBindFrameBuffer();
 
             GLES20.glViewport(0,0,mCanvasWidth,mCanvasHeight);
             imageFilter.draw(fTexture[0], mMatrix, mCanvasWidth, mCanvasHeight);

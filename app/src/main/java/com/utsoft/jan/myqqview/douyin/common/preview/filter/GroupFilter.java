@@ -1,13 +1,19 @@
 package com.utsoft.jan.myqqview.douyin.common.preview.filter;
 
 import android.opengl.GLES20;
+import android.util.Log;
 
+import com.utsoft.jan.common.utils.LogUtil;
 import com.utsoft.jan.myqqview.douyin.common.preview.GLUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
+
+import static android.opengl.GLES20.GL_FRAMEBUFFER;
+import static android.opengl.GLES20.GL_FRAMEBUFFER_COMPLETE;
+import static android.opengl.GLES20.glCheckFramebufferStatus;
 
 /**
  * Created by Administrator on 2019/10/8.
@@ -70,13 +76,16 @@ public class GroupFilter extends ImageFilter{
         updateFilter();
         textureIndex=0;
         for (ImageFilter filter:mFilters){
-            GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fFrame[0]);
-            GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
-                    GLES20.GL_TEXTURE_2D, fTexture[textureIndex%2], 0);
+            GLES20.glViewport(0,0,width,height);
+            GLUtils.bindFrameTexture(fFrame[0], fTexture[textureIndex%2]);
             GLES20.glFramebufferRenderbuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_DEPTH_ATTACHMENT,
                     GLES20.GL_RENDERBUFFER, fRender[0]);
+
+            if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+                LogUtil.e("zzz", "glFramebufferTexture2D error");
+            }
+
             GLUtils.checkError();
-            GLES20.glViewport(0,0,width,height);
             if(textureIndex==0){
                 final WaterMarkFilter filter1 = (WaterMarkFilter) filter;
                 filter1.init();
@@ -84,7 +93,7 @@ public class GroupFilter extends ImageFilter{
             }else{
                 filter.draw(fTexture[(textureIndex-1)%2],matrix,width,height);
             }
-            unBindFrame();
+            GLUtils.unBindFrameBuffer();
             textureIndex++;
         }
     }
@@ -106,20 +115,43 @@ public class GroupFilter extends ImageFilter{
 
     //创建FrameBuffer
     private boolean createFrameBuffer() {
+
         GLES20.glGenFramebuffers(1, fFrame, 0);
         GLES20.glGenRenderbuffers(1, fRender, 0);
 
-        genTextures();
-        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fFrame[0]);
+        //GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fFrame[0]);
         GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, fRender[0]);
         GLES20.glRenderbufferStorage(GLES20.GL_RENDERBUFFER, GLES20.GL_DEPTH_COMPONENT16, width,
                 height);
-        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
-                GLES20.GL_TEXTURE_2D, fTexture[0], 0);
+        //GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
+        //        GLES20.GL_TEXTURE_2D, fTexture[0], 0);
         GLES20.glFramebufferRenderbuffer(GLES20.GL_FRAMEBUFFER, GLES20.GL_DEPTH_ATTACHMENT,
                 GLES20.GL_RENDERBUFFER, fRender[0]);
-        unBindFrame();
+        GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, 0);
+        genTextures2();
+        //unBindFrame();
         return false;
+    }
+
+    private static final String TAG = "GroupFilter";
+
+    private void genTextures2() {
+        GLES20.glGenTextures(fTextureSize, fTexture, 0);
+        if (fTexture[0] == 0) {
+            Log.e(TAG, "createFrameTexture: glGenTextures is 0");
+        }
+        for (int i = 0; i < fTextureSize; i++) {
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, fTexture[i]);
+            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height, 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+            //设置环绕方向S，截取纹理坐标到[1/2n,1-1/2n]。将导致永远不会与border融合
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+            //设置环绕方向T，截取纹理坐标到[1/2n,1-1/2n]。将导致永远不会与border融合
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+            //设置缩小过滤为使用纹理中坐标最接近的一个像素的颜色作为需要绘制的像素颜色
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+            //设置放大过滤为使用纹理中坐标最接近的若干个颜色，通过加权平均算法得到需要绘制的像素颜色
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_NEAREST);
+        }
     }
 
     //生成Textures
@@ -138,8 +170,14 @@ public class GroupFilter extends ImageFilter{
 
     //取消绑定Texture
     private void unBindFrame() {
-        GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, 0);
+        //GLES20.glBindRenderbuffer(GLES20.GL_RENDERBUFFER, 0);
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+    }
+
+    private void deleteFrameBuffer() {
+        GLES20.glDeleteRenderbuffers(1, fRender, 0);
+        GLES20.glDeleteFramebuffers(1, fFrame, 0);
+        GLES20.glDeleteTextures(1, fTexture, 0);
     }
 
     public int getOutputTexture(){

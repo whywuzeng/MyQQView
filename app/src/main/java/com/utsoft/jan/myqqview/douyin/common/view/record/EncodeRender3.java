@@ -1,20 +1,16 @@
 package com.utsoft.jan.myqqview.douyin.common.view.record;
 
-import android.graphics.BitmapFactory;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
-import com.utsoft.jan.common.app.AppProfile;
-import com.utsoft.jan.myqqview.R;
 import com.utsoft.jan.myqqview.douyin.common.preview.GLUtils;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.BaseRenderImageFilter;
-import com.utsoft.jan.myqqview.douyin.common.preview.filter.GroupFilter;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.OriginRenderImage;
-import com.utsoft.jan.myqqview.douyin.common.preview.filter.WaterMarkFilter;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.carmera.NoFilter;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.carmera.ProcessFilter;
+import com.utsoft.jan.myqqview.douyin.common.preview.filter.carmera.ProcessFilter2;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -39,7 +35,9 @@ public class EncodeRender3 implements GLSurfaceView.Renderer {
 
     private OriginRenderImage originRenderImage;
 
-    private GroupFilter groupFilter;
+    //private GroupFilter groupFilter;
+
+    private ProcessFilter2 processFilter2;
 
     private ProcessFilter mProcessFilter;
 
@@ -61,7 +59,8 @@ public class EncodeRender3 implements GLSurfaceView.Renderer {
         originRenderImage =new OriginRenderImage();
         mProcessFilter = new ProcessFilter();
         mShow = new NoFilter();
-        groupFilter = new GroupFilter();
+        //groupFilter = new GroupFilter();
+        processFilter2 = new ProcessFilter2();
     }
 
     public SurfaceTexture getSurfaceTexture() {
@@ -85,12 +84,14 @@ public class EncodeRender3 implements GLSurfaceView.Renderer {
 
         mShow.create();
 
-        groupFilter.init();
+        processFilter2.onCreated();
 
-        final WaterMarkFilter drawer = new WaterMarkFilter();
-        drawer.setWaterMark(BitmapFactory.decodeResource(AppProfile.getContext().getResources(), R.mipmap.bufuhanzhe));
-        drawer.setPosition(0, 70, 0, 0);
-        groupFilter.addFilter(drawer);
+        //groupFilter.init();
+
+        //final WaterMarkFilter drawer = new WaterMarkFilter();
+        //drawer.setWaterMark(BitmapFactory.decodeResource(AppProfile.getContext().getResources(), R.mipmap.bufuhanzhe));
+        //drawer.setPosition(0, 70, 0, 0);
+        //groupFilter.addFilter(drawer);
 
     }
 
@@ -109,7 +110,9 @@ public class EncodeRender3 implements GLSurfaceView.Renderer {
         originRenderImage.surfaceChangedSize(width,height);
         originRenderImage.setInputTextureId(mTextureId);
 
-        groupFilter.setSize(width,height);
+        //groupFilter.setSize(width,height);
+
+        processFilter2.onChanged(width,height);
 
         //直接调用
         mProcessFilter.onChanged(width,height);
@@ -137,9 +140,12 @@ public class EncodeRender3 implements GLSurfaceView.Renderer {
         originRenderImage.draw(0,matrix);
         GLUtils.unBindFrameBuffer();
 
-        groupFilter.draw(matrix,fTexture[0]);
+        //groupFilter.draw(matrix,fTexture[0]);
 
-        mProcessFilter.setInputTextureId(groupFilter.getOutputTexture());
+        processFilter2.setInputTextureId(fTexture[0]);
+        processFilter2.draw();
+
+        mProcessFilter.setInputTextureId(processFilter2.getOutputTextureId());
         mProcessFilter.draw();
 
         GLES20.glViewport(0,0,mCanvasWidth,mCanvasHeight);

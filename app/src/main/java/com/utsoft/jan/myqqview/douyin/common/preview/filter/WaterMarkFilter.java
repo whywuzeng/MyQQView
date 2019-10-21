@@ -1,6 +1,7 @@
 package com.utsoft.jan.myqqview.douyin.common.preview.filter;
 
 import android.graphics.Bitmap;
+import android.opengl.GLES20;
 
 import com.utsoft.jan.myqqview.douyin.common.preview.GLUtils;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.carmera.NoFilter;
@@ -52,7 +53,6 @@ public class WaterMarkFilter extends ImageFilter{
         this.mBitmap=bitmap;
 
         textureIDI = GLUtils.loadBitmapTexture(mBitmap);
-        mNoFilter.setInputTextureId(textureIDI);
     }
 
     public void setPosition(int x,int y,int width,int height){
@@ -83,6 +83,7 @@ public class WaterMarkFilter extends ImageFilter{
         mNoFilter = new NoFilter();
         mNoFilter.create();
         mNoFilter.surfaceChangedSize(w,h);
+        mNoFilter.setInputTextureId(textureIDI);
     }
 
     @Override
@@ -96,13 +97,13 @@ public class WaterMarkFilter extends ImageFilter{
     }
 
     @Override
-    protected void onDraw(int textureId, float[] texMatrix) {
+    public void onDraw(int textureId, float[] texMatrix) {
         //GLES20.glViewport(x,y,w == 0 ? mBitmap.getWidth():w,h==0?mBitmap.getHeight():h);
 
-//        GLES20.glViewport(0,50, (int) (mBitmap.getWidth()*1.5f), (int) (mBitmap.getHeight()*1.5f));
+        GLES20.glViewport(0,50, (int) (mBitmap.getWidth()*1.5f), (int) (mBitmap.getHeight()*1.5f));
 ////        GLES20.glViewport(0,0,width,height);
-//        GLES20.glEnable(GLES20.GL_BLEND);
-//        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 //
 //        glUniformMatrix4fv(uTexMatrixLocation,1,false,texMatrix,0);
 //        checkGlError("glUniformMatrix4fv");
@@ -118,9 +119,9 @@ public class WaterMarkFilter extends ImageFilter{
 //        glClear(GL_COLOR_BUFFER_BIT);
 //        glDrawArrays(GL_TRIANGLE_STRIP,0,4);
 //
-//        GLES20.glDisable(GLES20.GL_BLEND);
 
         mNoFilter.draw();
+        GLES20.glDisable(GLES20.GL_BLEND);
 
     }
 }
