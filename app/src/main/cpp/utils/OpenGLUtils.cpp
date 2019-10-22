@@ -96,10 +96,10 @@ GLuint buildProgram(const char* verTex,const char* FragTex) {
     return programId;
 }
 
-void checkError() {
+void checkError(const char *outString) {
     if (glGetError()!=GL_NO_ERROR)
     {
-        ALOGE("glGetError %d",glGetError());
+        ALOGE("glGetError %s %d", outString, glGetError());
     }
 }
 

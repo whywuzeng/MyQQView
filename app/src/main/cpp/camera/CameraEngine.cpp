@@ -6,13 +6,26 @@
 #include "../utils/OpenGLUtils.h"
 #include <GLES2/gl2ext.h>
 
+const static GLfloat VERTICES[] = {
+        -1.0f, 1.0f,
+        1.0f, 1.0f,
+        -1.0f, -1.0f,
+        1.0f, -1.0f
+};
+
+const static GLfloat TEX_COORDS[] = {
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 0.0f
+};
+
 CameraEngine::CameraEngine(ANativeWindow *window):manager(new EGLManager(window)) {
 
 }
 
 CameraEngine::~CameraEngine() {
     if (manager){
-        manager->release();
         delete manager;
         manager = nullptr;
     }
@@ -77,4 +90,32 @@ void CameraEngine::draw(GLfloat *matrix) {
     glUniformMatrix4fv(uTexMatrixLocation,1, GL_FALSE,matrix);
 
     //开启顶点数组缓冲区，第0个
+    glEnableVertexAttribArray(aPositionLocation);
+    glEnableVertexAttribArray(aTextureCoordLocation);
+
+    glVertexAttribPointer(aPositionLocation, 2, GL_FLOAT, GL_FALSE, 0, VERTICES);
+    checkError("aPositionLocation");
+
+    glVertexAttribPointer(aTextureCoordLocation, 2, GL_FLOAT, GL_FALSE, 0, TEX_COORDS);
+    checkError("aTextureCoordLocation");
+
+    //画方形
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glDisableVertexAttribArray(aPositionLocation);
+    glDisableVertexAttribArray(aTextureCoordLocation);
+
+    glFlush();
+
+    manager->swapBuffer();
 }
+
+void CameraEngine::stop() {
+    glDeleteTextures(1, &mTextureId);
+    glDeleteProgram(mProgram);
+    manager->release();
+}
+
+
+
+

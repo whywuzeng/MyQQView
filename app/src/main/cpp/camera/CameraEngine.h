@@ -19,6 +19,8 @@ public:
 
     void draw(GLfloat *matrix);
 
+    void stop();
+
 private:
     EGLManager *manager;
     AAssetManager *mAssetManager;
