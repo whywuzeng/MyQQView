@@ -17,7 +17,12 @@
                  SHARED
 
                  # Provides a relative path to your source file(s).
-                 src/main/cpp/BeaCamera4.cpp )
+                 src/main/cpp/BeaCamera4.cpp
+                src/main/cpp/egl/EGLCore.cpp
+            src/main/cpp/egl/EGLManager.cpp
+            src/main/cpp/camera/CameraEngine.cpp
+            src/main/cpp/utils/OpenGLUtils.cpp
+            )
 
     # Specifies a path to native header files.
     include_directories(src/main/cpp/include/)

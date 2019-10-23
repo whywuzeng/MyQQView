@@ -76,18 +76,20 @@ GLuint buildProgram(const char* verTex,const char* FragTex) {
 
     if (param == 0)
     {
-        GLchar log ='';
-        glGetProgramInfoLog(programId,1, nullptr,&log);
-        ALOGE("program Log %s",&log);
+        GLint infoLen = 0;
+        glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &infoLen);
+        GLchar *log =(char *)malloc(sizeof(char)*infoLen);
+        glGetProgramInfoLog(programId,1, nullptr,log);
+        ALOGE("program Log %s",log);
         glDeleteProgram(programId);
         return 0;
     }
 
     glValidateProgram(programId);
-    GLint param = 0;
-    glGetProgramiv(programId,GL_VALIDATE_STATUS,&param);
+    GLint paramStatus = 0;
+    glGetProgramiv(programId,GL_VALIDATE_STATUS,&paramStatus);
 
-    if (param == 0)
+    if (paramStatus == 0)
     {
         glDeleteProgram(programId);
         return 0;
@@ -122,9 +124,11 @@ GLuint complieShader(GLenum type,const char *shaderCode)
 
     if (param == 0)
     {
-        GLchar log ='';
-        glGetShaderInfoLog(shaderId,1, nullptr,&log);
-        ALOGE("load shader failed log is %s",&log);
+        GLint infoLen = 0;
+        glGetShaderiv(shaderId,GL_INFO_LOG_LENGTH,&infoLen);
+        char *infoLog= (char*)malloc(sizeof(char) *infoLen);
+        glGetShaderInfoLog(shaderId,1, nullptr,infoLog);
+        ALOGE("load shader failed log is %s",infoLog);
         glDeleteShader(shaderId);
         return 0;
     }

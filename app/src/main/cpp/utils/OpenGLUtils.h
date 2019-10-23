@@ -11,7 +11,7 @@
 
 GLuint loadTextureFromAssets(AAssetManager *manager, const char *fileName);
 std::string* readShaderFromAsset(AAssetManager *manager, const char *fileName);
-GLuint buildProgram(const char* verTex,const char* FragTex)
+GLuint buildProgram(const char* verTex,const char* FragTex);
 
 void checkError(const char *outString);
 GLuint complieShader(GLenum type,const char *shaderCode);

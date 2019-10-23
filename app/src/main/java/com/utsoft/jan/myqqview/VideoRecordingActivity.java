@@ -124,50 +124,29 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
     }
 
     private void initMaslayout() {
-        masterLayout.animation(); //Need to call this method for animation and progression
-
-        if (MasterLayout.flg_frmwrk_mode == 1) {
-
-            //Start state. Call any method that you want to execute
-
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    // TODO Auto-generated method stub
-                }
-            });
-
-            //downLoadSigTask = new DownLoadSigTask();
-            //
-            //downLoadSigTask.execute();
-        }
-        if (MasterLayout.flg_frmwrk_mode == 2) {
-
-            //Running state. Call any method that you want to execute
-
-            downLoadSigTask.cancel(true);
-            masterLayout.reset();
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    // TODO Auto-generated method stub
-                }
-            });
-        }
-        if (MasterLayout.flg_frmwrk_mode == 3) {
-
-            //End state. Call any method that you want to execute.
-
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    // TODO Auto-generated method stub
-                }
-            });
-        }
+        CameraActivity.startCameraActivity(VideoRecordingActivity.this,null);
+        return;
+        //masterLayout.animation(); //Need to call this method for animation and progression
+        //
+        //if (MasterLayout.flg_frmwrk_mode == 1) {
+        //
+        //    //Start state. Call any method that you want to execute
+        //
+        //    //downLoadSigTask = new DownLoadSigTask();
+        //    //
+        //    //downLoadSigTask.execute();
+        //}
+        //if (MasterLayout.flg_frmwrk_mode == 2) {
+        //
+        //    //Running state. Call any method that you want to execute
+        //
+        //    downLoadSigTask.cancel(true);
+        //    masterLayout.reset();
+        //}
+        //if (MasterLayout.flg_frmwrk_mode == 3) {
+        //
+        //
+        //}
     }
 
      class DownLoadSigTask extends AsyncTask<String, Integer, String> {

@@ -7,9 +7,35 @@
 #include <android/asset_manager_jni.h>
 #include "camera/CameraEngine.h"
 
+
+
 extern "C" {
 
 CameraEngine *glCamera = nullptr;
+
+JNIEXPORT void JNICALL
+Java_com_utsoft_jan_myqqview_utils_OpenGLJinLib_camereRelease(JNIEnv *env, jclass type) {
+
+    // TODO
+    if (glCamera)
+    {
+        glCamera->stop();
+    }
+}
+
+JNIEXPORT void JNICALL
+Java_com_utsoft_jan_myqqview_utils_OpenGLJinLib_cameroDraw(JNIEnv *env, jclass type,
+                                                           jfloatArray matrix_) {
+    jfloat *matrix = env->GetFloatArrayElements(matrix_, NULL);
+
+    // TODO
+    if(glCamera)
+    {
+       glCamera->draw(matrix);
+    }
+
+    env->ReleaseFloatArrayElements(matrix_, matrix, 0);
+}
 
 JNIEXPORT jstring JNICALL
 Java_com_utsoft_jan_myqqview_utils_OpenGLJinLib_sayHello(JNIEnv *env, jclass type) {

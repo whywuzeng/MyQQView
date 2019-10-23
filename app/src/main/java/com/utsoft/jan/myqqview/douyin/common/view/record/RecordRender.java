@@ -2,7 +2,6 @@ package com.utsoft.jan.myqqview.douyin.common.view.record;
 
 import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
-import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
@@ -11,7 +10,6 @@ import com.utsoft.jan.myqqview.douyin.common.preview.filter.GroupFilter;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.ImageFilter;
 import com.utsoft.jan.myqqview.douyin.common.preview.filter.NoFilter;
 import com.utsoft.jan.myqqview.douyin.common.recoder.video.VideoFrameData;
-import com.utsoft.jan.myqqview.utils.OpenGLJinLib;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -62,7 +60,6 @@ public class RecordRender implements GLSurfaceView.Renderer {
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         //        mTextureId = GLUtils.createTextureObject(GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
-        OpenGLJinLib.cameroInit()
         mSurfaceTexture = new SurfaceTexture(mTextureId);
         mTarget.onSurfaceCreated(mSurfaceTexture, EGL14.eglGetCurrentContext());
 

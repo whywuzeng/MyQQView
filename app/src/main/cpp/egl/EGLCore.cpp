@@ -35,8 +35,8 @@ EGLBoolean EGLCore::initEGLContent(EGLContext shareContent) {
         return GL_FALSE;
     }
 
-    EGLint major = nullptr;
-    EGLint minor = nullptr;
+    EGLint major = 0;
+    EGLint minor = 0;
     if (!eglInitialize(mEGLDisPlay,&major,&minor))
     {
         ALOGE("eglInitialize is error");

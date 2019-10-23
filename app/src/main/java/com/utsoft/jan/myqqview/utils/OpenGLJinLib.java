@@ -27,4 +27,9 @@ public class OpenGLJinLib {
     @Keep
     public static native int cameroInit(Surface surface, int width, int height, AssetManager assetManager);
 
+    @Keep
+    public static native void cameroDraw(float[] matrix);
+
+    @Keep
+    public static native void camereRelease();
 }
