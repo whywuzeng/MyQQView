@@ -74,6 +74,7 @@ Java_com_utsoft_jan_myqqview_utils_OpenGLJinLib_cameroInit(JNIEnv *env, jclass t
 
     glCamera = new CameraEngine(pWindow);
     glCamera->setAssertManager(pManager);
+    glCamera->reSize(width,height);
     return glCamera->create();
 }
 

@@ -92,6 +92,7 @@ EGLBoolean EGLCore::initEGLContent(EGLContext shareContent) {
     eglQueryContext(mEGLDisPlay,mEGLContext,EGL_CONTEXT_CLIENT_VERSION,&version);
 
     ALOGE("EGLContent is created client version is %d",version);
+    return GL_TRUE;
 }
 
 EGLSurface EGLCore::createWindowSurface(ANativeWindow *window) {
@@ -124,11 +125,12 @@ EGLBoolean EGLCore::makeCurrent(EGLSurface eglSurface) {
         return EGL_FALSE;
     }
 
-    if(eglMakeCurrent(mEGLDisPlay,eglSurface,eglSurface,mEGLContext))
+    if(!eglMakeCurrent(mEGLDisPlay,eglSurface,eglSurface,mEGLContext))
     {
         ALOGE("eglMakeCurrent failed: %d",eglGetError());
         return EGL_FALSE;
     }
+    return EGL_TRUE;
 }
 
 /**

@@ -21,6 +21,8 @@ public:
 
     void stop();
 
+    void reSize(GLsizei width1,GLsizei height1);
+
 private:
     EGLManager *manager;
     AAssetManager *mAssetManager;

@@ -36,11 +36,11 @@ int CameraEngine::create() {
     {
         return -1;
     }
-    std::string *baseVer = readShaderFromAsset(mAssetManager, "base_vertext");
-    std::string *baseFrag = readShaderFromAsset(mAssetManager, "base_fragText");
+    std::string *baseVer = readShaderFromAsset(mAssetManager, "base_fragText.glsl");
+    std::string *baseFrag = readShaderFromAsset(mAssetManager, "base_vertext.glsl");
 
     //程序id 参考java代码
-    mProgram = buildProgram(baseVer->c_str(),baseFrag->c_str());
+    mProgram = buildProgram(baseFrag->c_str(),baseVer->c_str());
 
     glGenTextures(1,&mTextureId);
     //绑定纹理
@@ -114,6 +114,11 @@ void CameraEngine::stop() {
     glDeleteTextures(1, &mTextureId);
     glDeleteProgram(mProgram);
     manager->release();
+}
+
+void CameraEngine::reSize(GLsizei width1, GLsizei height1) {
+    width = width1;
+    height = height1;
 }
 
 

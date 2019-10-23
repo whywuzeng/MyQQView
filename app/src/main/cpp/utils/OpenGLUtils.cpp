@@ -99,9 +99,11 @@ GLuint buildProgram(const char* verTex,const char* FragTex) {
 }
 
 void checkError(const char *outString) {
-    if (glGetError()!=GL_NO_ERROR)
+    GLint error = glGetError();
+    if (error!=GL_NO_ERROR)
     {
-        ALOGE("glGetError %s %d", outString, glGetError());
+        char err = (char)error;
+        ALOGE("glGetError %s %d", outString, err);
     }
 }
 
@@ -126,8 +128,8 @@ GLuint complieShader(GLenum type,const char *shaderCode)
     {
         GLint infoLen = 0;
         glGetShaderiv(shaderId,GL_INFO_LOG_LENGTH,&infoLen);
-        char *infoLog= (char*)malloc(sizeof(char) *infoLen);
-        glGetShaderInfoLog(shaderId,1, nullptr,infoLog);
+        char *infoLog= (char*)malloc(sizeof(char) * infoLen);
+        glGetShaderInfoLog(shaderId,infoLen, nullptr,infoLog);
         ALOGE("load shader failed log is %s",infoLog);
         glDeleteShader(shaderId);
         return 0;

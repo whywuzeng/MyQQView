@@ -1,6 +1,8 @@
 package com.utsoft.jan.myqqview.callback;
 
 import android.graphics.SurfaceTexture;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -30,6 +32,8 @@ public class CameraCallback implements SurfaceHolder.Callback {
     private int width;
     private int height;
     private SurfaceTexture surfaceTexture;
+
+    Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private float[] Matrix = new float[16];
 
@@ -69,7 +73,12 @@ public class CameraCallback implements SurfaceHolder.Callback {
                 });
 
                 mCameraCompat.setSurfaceTexture(surfaceTexture);
-                mCameraCompat.startPreview();
+                mainHandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mCameraCompat.startPreview();
+                    }
+                });
 
             }
         });
