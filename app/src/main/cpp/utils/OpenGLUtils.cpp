@@ -138,3 +138,52 @@ GLuint complieShader(GLenum type,const char *shaderCode)
     return shaderId;
 
 }
+
+GLuint createFrameTexture(int width, int height) {
+    if (width <= 0 || height <= 0) {
+        ALOGE("createOutputTexture: width or height is 0");
+        return -1;
+    }
+    GLuint textures = 0;
+    glGenTextures(1, &textures);
+    if (textures == 0) {
+        ALOGE("createFrameTexture: glGenTextures is 0");
+        return -1;
+    }
+
+    glBindTexture(GL_TEXTURE_2D, textures);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+    //设置环绕方向S，截取纹理坐标到[1/2n,1-1/2n]。将导致永远不会与border融合
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //设置环绕方向T，截取纹理坐标到[1/2n,1-1/2n]。将导致永远不会与border融合
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //设置缩小过滤为使用纹理中坐标最接近的一个像素的颜色作为需要绘制的像素颜色
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //设置放大过滤为使用纹理中坐标最接近的若干个颜色，通过加权平均算法得到需要绘制的像素颜色
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    return textures;
+}
+
+void bindFrameTexture(GLuint frame, GLuint fTexture,GLuint fRender) {
+    //2.绑定FBO
+    glBindFramebuffer(GL_FRAMEBUFFER, frame);
+    //4。把纹理绑定到FBO
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fTexture, 0);
+
+    //6.检查是否绑定成功
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        ALOGE("glFramebufferTexture2D error");
+    }
+
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+            GL_RENDERBUFFER, fRender);
+}
+
+void unbindFrameBuffer() {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
+
+

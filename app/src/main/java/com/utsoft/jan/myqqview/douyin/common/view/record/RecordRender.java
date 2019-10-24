@@ -59,7 +59,7 @@ public class RecordRender implements GLSurfaceView.Renderer {
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        //        mTextureId = GLUtils.createTextureObject(GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
+        //        mOutputTextureId = GLUtils.createTextureObject(GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
         mSurfaceTexture = new SurfaceTexture(mTextureId);
         mTarget.onSurfaceCreated(mSurfaceTexture, EGL14.eglGetCurrentContext());
 
@@ -135,16 +135,16 @@ public class RecordRender implements GLSurfaceView.Renderer {
 
         mSurfaceTexture.getTransformMatrix(mMatrix);
         //waterMarkFilter.init();
-        //        imageFilter.draw(mTextureId,mMatrix,mCanvasWidth,mCanvasHeight);
+        //        imageFilter.draw(mOutputTextureId,mMatrix,mCanvasWidth,mCanvasHeight);
 
         if (mOldFilter != null) {
             //mOldFilter.init();
             //GLUtils.bindFrameTexture(fFrame[0], fTexture[0]);
-            //mOldFilter.draw(mTextureId, mMatrix, mCanvasWidth, mCanvasHeight);
+            //mOldFilter.draw(mOutputTextureId, mMatrix, mCanvasWidth, mCanvasHeight);
             //GLUtils.unBindFrameBuffer();
 
             //GLUtils.bindFrameTexture(fFrame[0], fTexture[0]);
-            //waterMarkFilter.draw(mTextureId, mMatrix, mCanvasWidth, mCanvasHeight);
+            //waterMarkFilter.draw(mOutputTextureId, mMatrix, mCanvasWidth, mCanvasHeight);
             //GLUtils.unBindFrameBuffer();
 
             GLES20.glViewport(0,0,mCanvasWidth,mCanvasHeight);

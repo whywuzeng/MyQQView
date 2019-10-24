@@ -15,5 +15,7 @@ GLuint buildProgram(const char* verTex,const char* FragTex);
 
 void checkError(const char *outString);
 GLuint complieShader(GLenum type,const char *shaderCode);
-
+GLuint createFrameTexture(int width,int height);
+void bindFrameTexture(GLuint frame,GLuint fTexture,GLuint fRender);
+void unbindFrameBuffer();
 #endif //MYQQVIEW_OPENGLUTILS_H

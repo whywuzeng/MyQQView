@@ -182,6 +182,6 @@ public class GroupFilter extends ImageFilter{
 
     public int getOutputTexture(){
         return size==0?mTextureId:fTexture[(textureIndex-1)%2];
-        //return mTextureId;
+        //return mOutputTextureId;
     }
 }
