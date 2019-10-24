@@ -9,6 +9,7 @@
 #include <android/native_window.h>
 #include "EGLManager.h"
 #include "../egl/EGLManager.h"
+#include "../filter/OESImageFilter.h"
 
 
 class CameraRender {
@@ -26,6 +27,8 @@ public:
 
 private:
     EGLManager *pEGLManager;
+
+    OESImageFilter *oesImageFilter;
 };
 
 

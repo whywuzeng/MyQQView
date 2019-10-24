@@ -37,6 +37,10 @@ void OESImageFilter::onDrawAfter() {
 void OESImageFilter::onCreated() {
     GPUImageFilter::onCreated();
 
+    vPositionLocation = glGetAttribLocation(mProgram, "aPosition");
+    vCoordLocation = glGetAttribLocation(mProgram, "aTextureCoord");
+    vMatrixLocation = glGetUniformLocation(mProgram, "uTexMatrix");
+    vTextureLocation = glGetUniformLocation(mProgram, "vTexture");
 }
 
 void OESImageFilter::onChanged() {

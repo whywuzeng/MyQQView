@@ -39,8 +39,6 @@ public:
     GLuint getOutPutTextureId ();
 private:
 
-    GLuint mProgram = 0;
-
     GLuint mOutputTextureId = 0;
 
 private:
@@ -51,6 +49,8 @@ private:
 
 
 protected:
+
+    GLuint mProgram = 0;
     //vertex location
     GLint vPositionLocation = 0;
 
