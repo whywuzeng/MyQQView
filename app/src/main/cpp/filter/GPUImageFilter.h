@@ -31,6 +31,8 @@ public:
             0,0,0,1
     };
 
+     float *pMatrix;
+
 
     void setMatrix(float matrix[]);
 

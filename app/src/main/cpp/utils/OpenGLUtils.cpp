@@ -4,6 +4,7 @@
 
 #include "OpenGLUtils.h"
 #include <android/log.h>
+#include <GLES2/gl2ext.h>
 
 #define LOG_TAG "C++ OpenGLUtils"
 #define ALOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
@@ -183,6 +184,25 @@ void bindFrameTexture(GLuint frame, GLuint fTexture,GLuint fRender) {
 void unbindFrameBuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
+
+GLuint getOESTextureId() {
+
+    GLuint mTextureId;
+
+    glGenTextures(1,&mTextureId);
+    //绑定纹理
+    glBindTexture(GL_TEXTURE_EXTERNAL_OES,mTextureId);
+    //设置缩小过滤为使用纹理中坐标最接近的一个像素的颜色作为需要绘制的像素颜色，少量计算，渲染比较快，但是效果差
+    glTexParameterf(GL_TEXTURE_EXTERNAL_OES,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+    //设置放大过滤为使用纹理中坐标最接近的若干个颜色，通过加权平均算法得到需要绘制的像素颜色，需要算法计算，用时相对变长，效果好
+    glTexParameterf(GL_TEXTURE_EXTERNAL_OES,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+    //这里GL_TEXTURE_WRAP_S 纹理坐标是以S轴方向与T轴方向纹理（对应平面坐标x，y方向）
+    glTexParameterf(GL_TEXTURE_EXTERNAL_OES,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_EXTERNAL_OES,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+    return mTextureId;
+}
+
+
 
 
 

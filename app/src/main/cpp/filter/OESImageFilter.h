@@ -26,6 +26,8 @@ protected:
 public:
     void onChanged() override;
 
+    void release();
+
 protected:
     void onBindTexture() override;
 

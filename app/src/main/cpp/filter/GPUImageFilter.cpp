@@ -9,6 +9,7 @@
 
 GPUImageFilter::GPUImageFilter( AAssetManager *manager) {
     this->pManager = manager;
+    this->pMatrix = matrix;
 }
 
 void GPUImageFilter::create() {
@@ -40,16 +41,18 @@ void GPUImageFilter::draw() {
 }
 
 void GPUImageFilter::setMatrix(float *smatrix) {
-    size_t n = sizeof(this->matrix) / sizeof(matrix[0]);
-    size_t tn = sizeof(smatrix) / sizeof(smatrix);
-    int i1 = (int) n;
-    int i2 = (int) tn;
-    if (i1 != i2) {
+//    size_t n = sizeof(this->matrix) / sizeof(matrix[0]);
+//    size_t tn = sizeof(smatrix) / sizeof(smatrix);
+//    int i1 = (int) n;
+//    int i2 = (int) tn;
+//    if (i1 != i2) {
+//
+//    }
+//    for (int i = 0; i < n; ++i) {
+//        this->matrix[i] = smatrix[i];
+//    }
 
-    }
-    for (int i = 0; i < n; ++i) {
-        this->matrix[i] = smatrix[i];
-    }
+    this->pMatrix = smatrix;
 }
 
 void GPUImageFilter::clear() {
@@ -62,7 +65,7 @@ void GPUImageFilter::useProgram() {
 }
 
 void GPUImageFilter::onSetExpandData() {
-    glUniformMatrix4fv(vMatrixLocation, 1, GL_FALSE, matrix);
+    glUniformMatrix4fv(vMatrixLocation, 1, GL_FALSE, pMatrix);
 }
 
 void GPUImageFilter::onBindTexture() {

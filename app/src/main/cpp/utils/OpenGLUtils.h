@@ -18,4 +18,6 @@ GLuint complieShader(GLenum type,const char *shaderCode);
 GLuint createFrameTexture(int width,int height);
 void bindFrameTexture(GLuint frame,GLuint fTexture,GLuint fRender);
 void unbindFrameBuffer();
+
+GLuint getOESTextureId();
 #endif //MYQQVIEW_OPENGLUTILS_H

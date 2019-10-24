@@ -21,14 +21,21 @@ public:
 
     GLuint create();
 
-    void change();
+    void change(int width,int height);
 
     void draw(float matrix[]);
+
+    void stop();
 
 private:
     EGLManager *pEGLManager;
 
     OESImageFilter *oesImageFilter;
+
+    AAssetManager *Assetmanager;
+
+
+    GLuint OESTextureId;
 };
 
 

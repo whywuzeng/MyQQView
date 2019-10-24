@@ -32,4 +32,14 @@ public class OpenGLJinLib {
 
     @Keep
     public static native void camereRelease();
+
+
+    @Keep
+    public static native int cameraFilterInite(Surface surface, int width, int height, AssetManager assetManager);
+
+    @Keep
+    public static native void cameraFilterDraw(float[] matrix);
+
+    @Keep
+    public static native void cameraFilterRelease();
 }

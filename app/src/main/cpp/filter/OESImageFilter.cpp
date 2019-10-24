@@ -47,6 +47,10 @@ void OESImageFilter::onChanged() {
     createFrameTexture(width,height);
 }
 
+void OESImageFilter::release() {
+    deleteFrameBuffer();
+}
+
 
 
 
