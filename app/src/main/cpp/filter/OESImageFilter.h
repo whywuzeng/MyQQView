@@ -21,8 +21,6 @@ protected:
 
     void onDrawAfter() override;
 
-    void onCreated() override;
-
 public:
     void onChanged() override;
 

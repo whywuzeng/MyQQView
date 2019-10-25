@@ -24,15 +24,7 @@ public:
 
     void draw();
 
-     float matrix[] = {
-            1,0,0,0,
-            0,1,0,0,
-            0,0,1,0,
-            0,0,0,1
-    };
-
      float *pMatrix;
-
 
     void setMatrix(float matrix[]);
 
@@ -66,12 +58,11 @@ protected:
 
     AAssetManager *pManager;
 
-    virtual void onCreated();
 
     GLint width = 0;
     GLint height = 0;
 
-    void clear();
+    virtual void clear();
 
     void onSetExpandData();
 

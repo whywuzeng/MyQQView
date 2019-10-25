@@ -6,6 +6,12 @@
 #include "../utils/OpenGLUtils.h"
 #include "../info/RendererInfo.h"
 
+float matrix[] = {
+        1,0,0,0,
+        0,1,0,0,
+        0,0,1,0,
+        0,0,0,1
+};
 
 GPUImageFilter::GPUImageFilter( AAssetManager *manager) {
     this->pManager = manager;
@@ -16,12 +22,6 @@ void GPUImageFilter::create() {
     mProgram = buildProgram(getVertexSource(), getFragmentSource());
 }
 
-void GPUImageFilter::onCreated() {
-    vPositionLocation = glGetAttribLocation(mProgram, "vPosition");
-    vCoordLocation = glGetAttribLocation(mProgram, "vCoord");
-    vMatrixLocation = glGetUniformLocation(mProgram, "vMatrix");
-    vTextureLocation = glGetUniformLocation(mProgram, "vTexture");
-}
 
 void GPUImageFilter::surfaceChangeSize(GLint width, GLint height) {
     this->width = width;
@@ -66,12 +66,14 @@ void GPUImageFilter::useProgram() {
 
 void GPUImageFilter::onSetExpandData() {
     glUniformMatrix4fv(vMatrixLocation, 1, GL_FALSE, pMatrix);
+    checkError("vMatrixLocation");
 }
 
 void GPUImageFilter::onBindTexture() {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, mInputTextureId);
-    glUniform1f(vTextureLocation, 0);
+    glUniform1i(vTextureLocation, 0);
+    checkError("vTextureLocation");
 }
 
 GLuint GPUImageFilter::getOutPutTextureId() {
@@ -94,15 +96,17 @@ void GPUImageFilter::onDraw() {
     glEnableVertexAttribArray(vPositionLocation);
     glEnableVertexAttribArray(vCoordLocation);
 
-    glVertexAttribPointer(vPositionLocation,4,GL_FLOAT, GL_FALSE,0,FULL_RECT_VERTEX);
+    glVertexAttribPointer(vPositionLocation,2,GL_FLOAT, GL_FALSE,0,FULL_RECT_VERTEX);
     checkError("vPositionLocation");
-    glVertexAttribPointer(vCoordLocation,4,GL_FLOAT, GL_FALSE,0,FULL_RECT_TEXTURE_VERTEX);
+    glVertexAttribPointer(vCoordLocation,2,GL_FLOAT, GL_FALSE,0,FULL_RECT_TEXTURE_VERTEX);
     checkError("vCoordLocation");
 
     glDrawArrays(GL_TRIANGLE_STRIP,0,4);
 
     glDisableVertexAttribArray(vPositionLocation);
     glDisableVertexAttribArray(vCoordLocation);
+
+
 }
 
 void GPUImageFilter::deleteFrameBuffer() {
@@ -130,6 +134,22 @@ const char *GPUImageFilter::getVertexSource() {
 const char *GPUImageFilter::getFragmentSource() {
     std::string *pFragmentVextex = readShaderFromAsset(pManager, "default_fragment.glsl");
     return pFragmentVextex->c_str();
+}
+
+void GPUImageFilter::onChanged() {
+    vPositionLocation = glGetAttribLocation(mProgram, "vPosition");
+    vCoordLocation = glGetAttribLocation(mProgram, "vCoord");
+    vMatrixLocation = glGetUniformLocation(mProgram, "vMatrix");
+    vTextureLocation = glGetUniformLocation(mProgram, "vTexture");
+}
+
+void GPUImageFilter::onDrawBefore() {
+
+}
+
+void GPUImageFilter::onDrawAfter() {
+
+    glBindTexture(GL_TEXTURE_2D, GL_NONE);
 }
 
 

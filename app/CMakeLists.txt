@@ -22,6 +22,11 @@
             src/main/cpp/egl/EGLManager.cpp
             src/main/cpp/camera/CameraEngine.cpp
             src/main/cpp/utils/OpenGLUtils.cpp
+            src/main/cpp/filter/GPUImageFilter.cpp
+            src/main/cpp/camera/CameraRender.cpp
+            src/main/cpp/filter/OESImageFilter.cpp
+            src/main/cpp/filter/gpufilter/MagicNoFilter.cpp
+            src/main/cpp/filter/gpufilter/MagicProcessFilter.cpp
             )
 
     # Specifies a path to native header files.

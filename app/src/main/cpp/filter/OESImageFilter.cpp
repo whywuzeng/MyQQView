@@ -32,19 +32,17 @@ void OESImageFilter::onDrawBefore() {
 
 void OESImageFilter::onDrawAfter() {
     unbindFrameBuffer();
+    glBindTexture(GL_TEXTURE_EXTERNAL_OES, GL_NONE);
 }
 
-void OESImageFilter::onCreated() {
-    GPUImageFilter::onCreated();
+void OESImageFilter::onChanged() {
 
     vPositionLocation = glGetAttribLocation(mProgram, "aPosition");
     vCoordLocation = glGetAttribLocation(mProgram, "aTextureCoord");
     vMatrixLocation = glGetUniformLocation(mProgram, "uTexMatrix");
     vTextureLocation = glGetUniformLocation(mProgram, "vTexture");
-}
 
-void OESImageFilter::onChanged() {
-    createFrameTexture(width,height);
+    GPUImageFilter::createFrameBuffer();
 }
 
 void OESImageFilter::release() {

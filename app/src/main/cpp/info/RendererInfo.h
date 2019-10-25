@@ -17,9 +17,9 @@ const static GLfloat FULL_RECT_VERTEX[] ={
 
 
 const static float FULL_RECT_TEXTURE_VERTEX[] = {
-        0f,0f,
-        1f,0.0f,
-        0f,1.0f,
+        0.0f,0.0f,
+        1.0f,0.0f,
+        0.0f,1.0f,
         1.0f,1.0f
 };
 

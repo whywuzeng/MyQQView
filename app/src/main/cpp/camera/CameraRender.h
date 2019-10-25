@@ -7,9 +7,10 @@
 
 #include <android/asset_manager.h>
 #include <android/native_window.h>
-#include "EGLManager.h"
 #include "../egl/EGLManager.h"
 #include "../filter/OESImageFilter.h"
+#include "../filter/gpufilter/MagicNoFilter.h"
+#include "../filter/gpufilter/MagicProcessFilter.h"
 
 
 class CameraRender {
@@ -32,10 +33,16 @@ private:
 
     OESImageFilter *oesImageFilter;
 
-    AAssetManager *Assetmanager;
+    AAssetManager *aAssetManager;
 
 
     GLuint OESTextureId;
+
+    MagicNoFilter *magicNoFilter;
+
+    MagicProcessFilter *magicProcessFilter;
+
+
 };
 
 

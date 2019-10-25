@@ -58,7 +58,7 @@ public class CameraCallback implements SurfaceHolder.Callback {
         executor.execute(new Runnable() {
             @Override
             public void run() {
-                final int textureID = OpenGLJinLib.cameroInit(surface, width, height, AppProfile.getContext().getAssets());
+                final int textureID = OpenGLJinLib.cameraFilterInite(surface, width, height, AppProfile.getContext().getAssets());
                 if (textureID<0)
                 {
                     Log.e(TAG, "run: surfaceChanged create is failed" );
@@ -90,7 +90,7 @@ public class CameraCallback implements SurfaceHolder.Callback {
             public void run() {
                 surfaceTexture.updateTexImage();
                 surfaceTexture.getTransformMatrix(Matrix);
-                OpenGLJinLib.cameroDraw(Matrix);
+                OpenGLJinLib.cameraFilterDraw(Matrix);
             }
         });
     }
@@ -102,7 +102,7 @@ public class CameraCallback implements SurfaceHolder.Callback {
             public void run() {
                 surfaceTexture.release();
                 surfaceTexture = null;
-                OpenGLJinLib.camereRelease();
+                OpenGLJinLib.cameraFilterRelease();
             }
         });
     }

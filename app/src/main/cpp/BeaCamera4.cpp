@@ -50,7 +50,7 @@ Java_com_utsoft_jan_myqqview_utils_OpenGLJinLib_cameraFilterDraw(JNIEnv *env, jc
     jfloat *matrix = env->GetFloatArrayElements(matrix_, NULL);
 
     // TODO
-    if(cameraRender)
+    if(!cameraRender)
     {
         ALOGE("cameraRender obj is null");
         return;
