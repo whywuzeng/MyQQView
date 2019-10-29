@@ -124,7 +124,8 @@ public class VideoRecordingActivity extends PresenterActivity<RecordContract.Pre
     }
 
     private void initMaslayout() {
-        CameraActivity.startCameraActivity(VideoRecordingActivity.this,null);
+        //CameraActivity.startCameraActivity(VideoRecordingActivity.this,null);
+        lameActivity.start(VideoRecordingActivity.this);
         return;
         //masterLayout.animation(); //Need to call this method for animation and progression
         //

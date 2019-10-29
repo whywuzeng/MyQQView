@@ -50,6 +50,7 @@
         </activity>
         <activity android:name=".douyin.effect.activity.AfterEffectActivity"/>
         <activity android:name=".CameraActivity"/>
+        <activity android:name=".lameActivity"/>
     </application>
 
 </manifest>

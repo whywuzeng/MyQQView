@@ -1,13 +1,16 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 28
+
+
+
     defaultConfig {
-        applicationId "com.utsoft.jan.myqqview"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         externalNativeBuild {
@@ -16,15 +19,13 @@ android {
             }
         }
 
-        // Similar to other properties in the defaultConfig block,
-        // you can configure the ndk block for each product flavor
-        // in your build configuration.
         ndk {
             // Specifies the ABI configurations of your native
             // libraries Gradle should build and package with your APK.
             abiFilters 'x86', 'x86_64',  'armeabi-v7a'
         }
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -44,15 +45,9 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+
     implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation project(":common")
-    implementation project(":mp3encoder")
-
-    implementation "com.jakewharton:butterknife:$rootProject.ext.butterknifeVersion"
-    annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.ext.butterknifeVersion"
-
 }
