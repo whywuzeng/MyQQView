@@ -16,6 +16,7 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++11 -fexceptions"
+                targets 'mp3encodersub', 'mp3encoderJni'
             }
         }
 

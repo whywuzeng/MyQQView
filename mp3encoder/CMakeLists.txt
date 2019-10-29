@@ -1,31 +1,11 @@
  cmake_minimum_required(VERSION 3.4.1)
 
- include_directories(src/main/cpp/lame/include)
- link_directories(src/main/cpp/lame)
+ set(CMAKE_VERBOSE_MAKEFILE on)
 
- add_library(
-         mp3encoder
+ set(lib_src_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-         SHARED
+ set(lib_build_DIR $ENV{HOME}/tmp)
+ file(MAKE_DIRECTORY ${lib_build_DIR})
 
-         src/main/cpp/mp3EnconderJni.cpp
-         src/main/cpp/libmp3_encoder/Mp3Encoder.cpp
- )
-
- find_library( # Defines the name of the path variable that stores the
-         # location of the NDK library.
-         log-lib
-
-         # Specifies the name of the NDK library that
-         # CMake needs to locate.
-         log )
-
-
- target_link_libraries(
-         mp3encoder
-
-         libmp3lame.a
-         # Links the target library to the log library
-         # included in the NDK.
-         ${log-lib}
- )
+ add_subdirectory(${lib_src_DIR}/src/main/cpp ${lib_build_DIR}/mp3encoderJni)
+ add_subdirectory(${lib_src_DIR}/src/main/cpp/libmp3_encoder ${lib_build_DIR}/mp3encodersub)
